@@ -401,6 +401,8 @@
       width: 82px;
       height: 82px;
       object-fit: contain;
+      transform: scale(var(--stamp-scale, 1));
+      transition: transform .25s ease;
     }
 
     .target:not(.stamped):hover .target-glow,
@@ -668,8 +670,8 @@
       countLabel.textContent = String(stampedInStage);
       stageTotal.textContent = ` / ${stage.count}`;
       stageInstruction.innerHTML = selectedPattern
-        ? `將滑鼠停在紙上的光點 <strong>1 秒</strong>蓋印；蓋滿${stage.count}${stage.name}後進入下一步。`
-        : "先選一款圖樣，再將滑鼠停在紙上的光點 <strong>1 秒</strong>蓋印。";
+        ? `將滑鼠停在紙上的光點 <strong>1 秒</strong>蓋印；每枚印記大小略有不同。`
+        : "先選一款圖樣，再將滑鼠停在紙上的光點 <strong>1 秒</strong>蓋印；印記大小略有不同。";
     }
 
     patternButtons.forEach((button) => {
@@ -723,6 +725,7 @@
       const stampImage = target.querySelector(".stamp-image");
       stampImage.src = selectedPattern.image;
       stampImage.alt = `${selectedPattern.name}圖樣`;
+      target.style.setProperty("--stamp-scale", (0.9 + Math.random() * 0.25).toFixed(2));
       target.dataset.image = selectedPattern.image;
       target.setAttribute("aria-label", `${stage.name}：${selectedPattern.name}圖樣，已蓋印`);
       target.setAttribute("aria-pressed", "true");
@@ -880,6 +883,7 @@
         target.removeAttribute("aria-pressed");
         target.disabled = false;
         target.style.removeProperty("--progress");
+        target.style.removeProperty("--stamp-scale");
       });
       stageIndex = 0;
       selectedPattern = null;

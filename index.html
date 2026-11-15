@@ -302,7 +302,7 @@
 
     .leaf-canvas {
       position: absolute;
-      z-index: 4;
+      z-index: 3;
       inset: 0;
       display: block;
       width: 100%;
@@ -317,6 +317,23 @@
     }
 
     .leaf-canvas[hidden] { display: none; }
+
+    .leaf-guide {
+      position: absolute;
+      z-index: 5;
+      display: none;
+      width: 18px;
+      height: 18px;
+      border: 1px solid rgba(125, 150, 100, .55);
+      border-radius: 50%;
+      background: rgba(235, 242, 219, .82);
+      box-shadow: 0 0 18px 7px rgba(189, 210, 149, .58);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      animation: breathe 2.4s ease-in-out infinite;
+    }
+
+    .garden.leaf-mode .leaf-guide { display: block; }
 
     .garden::before {
       position: absolute;
@@ -366,6 +383,7 @@
 
     .target {
       position: absolute;
+      z-index: 5;
       display: grid;
       width: 104px;
       height: 104px;
@@ -560,12 +578,12 @@
     <section class="intro" aria-labelledby="game-title">
       <p class="eyebrow">A LITTLE GARDEN OF SEALS</p>
       <h1 id="game-title">花鳥蓋印所</h1>
-      <p class="subtitle">依序蓋下 5 朵花、用筆刷畫葉，再蓋 2 隻小鳥，織成專屬花布。</p>
+      <p class="subtitle">依序用筆刷畫葉、蓋下 5 朵花，再蓋 2 隻小鳥，織成專屬花布。</p>
     </section>
 
     <section class="game-card" aria-label="花鳥蓋印遊戲">
       <aside class="sidebar">
-        <h2 class="section-label" id="stage-heading">01　選一款花樣，再蓋 5 朵花</h2>
+        <h2 class="section-label" id="stage-heading">01　用葉片筆刷自由描畫</h2>
         <div class="pattern-list" role="group" aria-label="選擇蓋印圖樣">
           <button class="pattern-option" type="button" data-kind="flower" data-image="crocus-1279508_1280.webp" data-name="紫花" aria-pressed="false" aria-label="選擇紫花圖樣">
             <img class="pattern-preview" src="crocus-1279508_1280.webp" alt=""><span class="pattern-name">紫花</span>
@@ -581,8 +599,8 @@
           </button>
         </div>
 
-        <p class="instruction" id="stage-instruction">先選一款花樣，再將滑鼠停在紙上的光點 <strong>1 秒</strong>，蓋滿 5 朵花後進入下一步。</p>
-        <p class="game-status" id="game-status" role="status">選好花樣就開始蓋印。</p>
+        <p class="instruction" id="stage-instruction">選擇葉片後，在白紙上移動滑鼠自由描畫。完成後按 OK 前往下一步。</p>
+        <p class="game-status" id="game-status" role="status">先選一款葉片圖樣，再在紙上描畫。</p>
         <button class="finish-leaves" id="finish-leaves" type="button" disabled hidden>OK，完成葉片並進入小鳥</button>
 
         <div class="progress-card" aria-live="polite">
@@ -599,10 +617,15 @@
       </aside>
 
       <div class="garden" id="garden" aria-label="花鳥印箋；花鳥停留一秒蓋印，葉片階段可用滑鼠自由描畫">
-        <div class="garden-note">花鳥印箋<span>循序蓋印：花五朵、葉筆刷、鳥兩隻</span></div>
+        <div class="garden-note">花鳥印箋<span>循序蓋印：葉筆刷、花五朵、鳥兩隻</span></div>
         <span class="leaf-decoration leaf-one" aria-hidden="true">印</span>
         <span class="leaf-decoration leaf-two" aria-hidden="true">花</span>
         <canvas class="leaf-canvas" id="leaf-canvas" aria-label="自由繪製葉片的畫紙區" hidden></canvas>
+        <span class="leaf-guide" style="left:19%;top:32%" aria-hidden="true"></span>
+        <span class="leaf-guide" style="left:42%;top:26%" aria-hidden="true"></span>
+        <span class="leaf-guide" style="left:70%;top:35%" aria-hidden="true"></span>
+        <span class="leaf-guide" style="left:31%;top:67%" aria-hidden="true"></span>
+        <span class="leaf-guide" style="left:79%;top:70%" aria-hidden="true"></span>
         <button class="target" type="button" data-stage="flower" style="left:19%;top:28%" aria-label="尚未蓋印的花朵位置一">
           <span class="target-glow" aria-hidden="true"></span><span class="target-progress" aria-hidden="true"></span><span class="target-stamp" aria-hidden="true"><img class="stamp-image" alt=""></span>
         </button>
@@ -651,8 +674,8 @@
     const fabricDownload = document.getElementById("fabric-download");
     const generateFabricButton = document.getElementById("generate-fabric");
     const stages = [
-      { key: "flower", kind: "flower", name: "花朵", heading: "01　選一款花樣，再蓋 5 朵花", count: 5 },
-      { key: "leaf", kind: "leaf", name: "葉片", heading: "02　用葉片筆刷自由描畫", count: null },
+      { key: "leaf", kind: "leaf", name: "葉片", heading: "01　用葉片筆刷自由描畫", count: null },
+      { key: "flower", kind: "flower", name: "花朵", heading: "02　選一款花樣，再蓋 5 朵花", count: 5 },
       { key: "bird", kind: "bird", name: "小鳥", heading: "03　選一款鳥樣，再蓋 2 隻小鳥", count: 2 }
     ];
     let stageIndex = 0;
@@ -664,6 +687,7 @@
     const leafBrushSize = 48;
     const leafBrushGap = 5;
     const leafBrushStep = leafBrushSize + leafBrushGap;
+    const maxLeafMarks = 12;
     const artImageCache = new Map();
     const loadedArtImages = new Map();
     let fabricObjectUrl = null;
@@ -708,7 +732,7 @@
       countLabel.textContent = String(stage.key === "leaf" ? leafMarks.length : stampedInStage);
       stageTotal.textContent = stage.count === null ? " 片已畫" : ` / ${stage.count}`;
       if (stage.key === "leaf") {
-        stageInstruction.innerHTML = `選擇葉片後，在白紙上移動滑鼠自由描畫；葉片筆刷為 ${leafBrushSize}px，葉與葉間距 <strong>${leafBrushGap}px</strong>。完成後按 OK 前往下一步。`;
+        stageInstruction.innerHTML = `選擇葉片後，在白紙上移動滑鼠自由描畫；葉片筆刷為 ${leafBrushSize}px，葉與葉間距 <strong>${leafBrushGap}px</strong>，最多 ${maxLeafMarks} 片。完成後按 OK 前往下一步。`;
         return;
       }
       stageInstruction.innerHTML = selectedPattern
@@ -761,6 +785,7 @@
 
     function addLeafMark(x, y, angle) {
       if (!selectedPattern || !loadedArtImages.has(selectedPattern.image)) return;
+      if (leafMarks.length >= maxLeafMarks) return;
       const bounds = garden.getBoundingClientRect();
       const mark = {
         x: x / bounds.width,
@@ -773,6 +798,10 @@
       countLabel.textContent = String(leafMarks.length);
       stageTotal.textContent = " 片已畫";
       finishLeavesButton.disabled = false;
+      if (leafMarks.length === maxLeafMarks) {
+        gameStatus.textContent = `已畫滿 ${maxLeafMarks} 片葉；按 OK 前往下一步。`;
+        return;
+      }
       if (leafMarks.length === 1 || leafMarks.length % 20 === 0) {
         gameStatus.textContent = `葉片筆刷已畫 ${leafMarks.length} 片；完成後按 OK 前往小鳥。`;
       }
@@ -780,6 +809,7 @@
 
     function paintLeafAtPointer(event) {
       if (stages[stageIndex]?.key !== "leaf" || !selectedPattern || !loadedArtImages.has(selectedPattern.image)) return;
+      if (leafMarks.length >= maxLeafMarks) return;
       const bounds = garden.getBoundingClientRect();
       const current = {
         x: Math.max(leafBrushSize / 2, Math.min(event.clientX - bounds.left, bounds.width - leafBrushSize / 2)),
@@ -949,8 +979,8 @@
       const sources = [...new Set(Object.values(imagesByStage).flat())];
       const loadedImages = new Map(await Promise.all(sources.map(async (src) => [src, await loadArtImage(src)])));
       const tile = document.createElement("canvas");
-      tile.width = 1200;
-      tile.height = 1200;
+      tile.width = 2000;
+      tile.height = 2000;
       const tileContext = tile.getContext("2d");
       if (!tileContext) throw new Error("無法建立花布圖樣畫布。");
 
@@ -974,11 +1004,11 @@
           const image = loadedImages.get(src);
           const centerX = columnIndex * cellSize + cellSize / 2;
           const centerY = rowIndex * cellSize + cellSize / 2;
-          const size = Math.round(180 + Math.random() * 120);
+          const size = kind === "bird" ? 500 : Math.random() < .5 ? 100 : 300;
           const scale = Math.min(size / image.naturalWidth, size / image.naturalHeight);
           const width = image.naturalWidth * scale;
           const height = image.naturalHeight * scale;
-          const rotation = (Math.random() - .5) * .16;
+          const rotation = kind === "bird" ? 0 : (Math.random() - .5) * .16;
 
           tileContext.save();
           tileContext.translate(centerX, centerY);
@@ -1009,8 +1039,8 @@
       });
 
       const canvas = document.createElement("canvas");
-      canvas.width = 2400;
-      canvas.height = 2400;
+      canvas.width = 4000;
+      canvas.height = 4000;
       const context = canvas.getContext("2d");
       if (!context) throw new Error("無法建立 JPG 輸出畫布。");
       const pattern = context.createPattern(tile, "repeat");
@@ -1038,7 +1068,7 @@
         fabricPreview.src = fabricObjectUrl;
         fabricDownload.href = fabricObjectUrl;
         fabricDownload.hidden = false;
-        fabricStatus.textContent = "重複花布 JPG 已生成（2400 × 2400）；花鳥印記為 180–300px，葉片沿你的筆刷路徑排列，可下載保存。";
+        fabricStatus.textContent = "重複花布 JPG 已生成（4000 × 4000）；花為 100 或 300px、每隻鳥 500px，葉片沿筆刷路徑排列，可下載保存。";
       } catch (error) {
         if (generation === fabricGeneration) fabricStatus.textContent = `花布生成失敗：${error.message}`;
       } finally {

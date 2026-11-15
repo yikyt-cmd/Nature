@@ -1,10 +1,10 @@
 const OPENAI_IMAGE_ENDPOINT = "https://api.openai.com/v1/images/generations";
 const BACKGROUND_PROMPT = [
-  "Create an elegant warm-ivory woven silk fabric background for a traditional East Asian flower-and-bird print.",
-  "Use a subtle fine textile weave and delicate, low-contrast vermilion and sage decorative flourishes.",
-  "Keep the whole background evenly composed with plenty of quiet space.",
+  "Create a rich cinnabar-red woven silk background inspired by traditional Chinese printed cotton and brocade.",
+  "Cover it with a seamless, evenly spaced repeat of small classic Chinese key-fret geometry, auspicious cloud curls, and restrained antique-gold medallions.",
+  "Use a fine visible textile weave and balanced, orderly pattern spacing; keep the motifs decorative and low-contrast so foreground artwork remains clear.",
   "Do not draw flowers, leaves, birds, animals, objects, text, letters, frames, or watermarks.",
-  "Show a flat fabric surface from directly above with even lighting."
+  "Show a flat fabric surface from directly above with even lighting and no gradients or blank ivory areas."
 ].join(" ");
 
 function jsonResponse(body, status, origin) {

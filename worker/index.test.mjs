@@ -56,7 +56,10 @@ test("allows the Pages origin and returns a generated background", async (t) => 
   assert.equal(response.headers.get("Access-Control-Allow-Origin"), appOrigin);
   assert.deepEqual(body, { imageBase64: "aW1hZ2U=", mimeType: "image/png" });
   assert.equal(upstreamRequest.url, "https://api.openai.com/v1/images/generations");
-  assert.equal(JSON.parse(upstreamRequest.options.body).model, "gpt-image-2.6-flare");
+  const generationRequest = JSON.parse(upstreamRequest.options.body);
+  assert.equal(generationRequest.model, "gpt-image-2.6-flare");
+  assert.match(generationRequest.prompt, /cinnabar-red/i);
+  assert.match(generationRequest.prompt, /seamless.*repeat/i);
   assert.equal(upstreamRequest.options.headers.Authorization, "Bearer test-key");
 });
 

@@ -26,8 +26,10 @@
 
     body {
       min-width: 320px;
-      min-height: 100vh;
+      height: 100vh;
+      height: 100dvh;
       margin: 0;
+      overflow: hidden;
       background:
         radial-gradient(ellipse at 8% 8%, rgba(223, 229, 197, .58), transparent 34rem),
         radial-gradient(ellipse at 92% 88%, rgba(239, 218, 180, .38), transparent 33rem),
@@ -212,7 +214,7 @@
       max-height: min(30vh, 190px);
       border: 1px solid #e8ded1;
       object-fit: contain;
-      background: #fffaf0;
+      background: #a71922;
     }
 
     .fabric-status {
@@ -988,7 +990,41 @@
       });
     }
 
+    function selectFabricLeafMarks(maxMarks = 12) {
+      if (leafMarks.length <= maxMarks) return leafMarks;
+      const selected = [leafMarks[0]];
+      const minimumDistances = leafMarks.map((mark) => {
+        const deltaX = mark.x - selected[0].x;
+        const deltaY = mark.y - selected[0].y;
+        return deltaX * deltaX + deltaY * deltaY;
+      });
+
+      while (selected.length < maxMarks) {
+        let farthestIndex = -1;
+        let farthestDistance = -1;
+        minimumDistances.forEach((distance, index) => {
+          if (distance > farthestDistance) {
+            farthestDistance = distance;
+            farthestIndex = index;
+          }
+        });
+        const nextMark = leafMarks[farthestIndex];
+        selected.push(nextMark);
+        leafMarks.forEach((mark, index) => {
+          const deltaX = mark.x - nextMark.x;
+          const deltaY = mark.y - nextMark.y;
+          minimumDistances[index] = Math.min(
+            minimumDistances[index],
+            deltaX * deltaX + deltaY * deltaY
+          );
+        });
+      }
+
+      return selected;
+    }
+
     async function createFabricJpg(backgroundImage = null) {
+      const fabricLeafMarks = selectFabricLeafMarks();
       const paperBounds = garden.getBoundingClientRect();
       const stamps = targets
         .filter((target) => target.dataset.image)
@@ -1008,7 +1044,7 @@
         throw new Error("缺少花、葉或小鳥印樣，請重新完成蓋印流程。");
       }
 
-      const sources = [...new Set([...leafMarks.map((mark) => mark.image), ...stamps.map((stamp) => stamp.src)])];
+      const sources = [...new Set([...fabricLeafMarks.map((mark) => mark.image), ...stamps.map((stamp) => stamp.src)])];
       const loadedImages = new Map(await Promise.all(sources.map(async (src) => [src, await loadArtImage(src)])));
       const tile = document.createElement("canvas");
       tile.width = 4500;
@@ -1019,7 +1055,36 @@
       if (backgroundImage) {
         tileContext.drawImage(backgroundImage, 0, 0, tile.width, tile.height);
       } else {
-        tileContext.fillStyle = "#fffaf0";
+        const motifTile = document.createElement("canvas");
+        motifTile.width = 240;
+        motifTile.height = 240;
+        const motifContext = motifTile.getContext("2d");
+        if (!motifContext) throw new Error("無法建立花布底紋畫布。");
+        motifContext.fillStyle = "#a71922";
+        motifContext.fillRect(0, 0, motifTile.width, motifTile.height);
+        motifContext.strokeStyle = "rgba(241, 205, 126, .28)";
+        motifContext.lineWidth = 3;
+        motifContext.lineJoin = "round";
+        motifContext.beginPath();
+        motifContext.moveTo(120, 35);
+        motifContext.lineTo(205, 120);
+        motifContext.lineTo(120, 205);
+        motifContext.lineTo(35, 120);
+        motifContext.closePath();
+        motifContext.stroke();
+        motifContext.beginPath();
+        motifContext.arc(120, 120, 38, 0, Math.PI * 2);
+        motifContext.arc(120, 120, 25, 0, Math.PI * 2);
+        motifContext.stroke();
+        motifContext.fillStyle = "rgba(241, 205, 126, .32)";
+        [[120, 70], [170, 120], [120, 170], [70, 120]].forEach(([x, y]) => {
+          motifContext.beginPath();
+          motifContext.arc(x, y, 4, 0, Math.PI * 2);
+          motifContext.fill();
+        });
+        const textilePattern = tileContext.createPattern(motifTile, "repeat");
+        if (!textilePattern) throw new Error("無法建立紅色花布底紋。");
+        tileContext.fillStyle = textilePattern;
         tileContext.fillRect(0, 0, tile.width, tile.height);
       }
       tileContext.imageSmoothingEnabled = true;
@@ -1053,7 +1118,7 @@
       }
 
       repeatOffsets.forEach((repeatOffset) => {
-        leafMarks.forEach((mark) => {
+        fabricLeafMarks.forEach((mark) => {
           drawRepeatedStamp(
             loadedImages.get(mark.image),
             mark.x * repeatUnitWidth,

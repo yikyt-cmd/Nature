@@ -4,7 +4,7 @@
 
 遊戲網址：[https://yikyt-cmd.github.io/Nature/](https://yikyt-cmd.github.io/Nature/)
 
-直接在瀏覽器開啟 `index.html` 開始遊玩。白紙滿版顯示，選圖、進度、完成、重來及花布操作都在畫紙左上角。依序畫葉、蓋 5 朵花、蓋 2 隻鳥；完成後可下載 4500 × 4500 JPG。葉片筆刷大小隨機為 100–200px，間距 5px；花朵交替為 300px 和 600px，小鳥為 600px。花布會重複畫紙上的圖樣，可選本機暖白底或 AI 布底。畫紙印記不會傳給 AI；API 金鑰只存放在 Cloudflare Worker Secret。
+直接在瀏覽器開啟 `index.html` 開始遊玩。白紙滿版顯示，選圖、進度、完成、重來及花布操作都在畫紙左上角。依序畫葉、蓋 5 朵花、蓋 2 隻鳥；完成後可下載 4500 × 4500 JPG。葉片筆刷大小隨機為 100–200px，間距 5px；花朵交替為 300px 和 600px，小鳥為 600px。花布使用中國紅底與中式連續紋樣，會重複畫紙上的花鳥；輸出時均勻挑選至多 12 片葉子，避免過密。畫紙印記不會傳給 AI；API 金鑰只存放在 Cloudflare Worker Secret。
 
 #### 設定 AI 花布布底（選用）
 
@@ -12,7 +12,7 @@
 
 1. `npx wrangler login`
 2. `npx wrangler secret put OPENAI_API_KEY`，依提示輸入 OpenAI API 金鑰；不要將金鑰貼到網站或提交到 Git。
-3. `npx wrangler deploy`
+3. `npx wrangler deploy`（首次部署或更新 Worker）
 4. 完成遊戲後展開「AI 布底」，貼上 Worker 網址並按「儲存」，再按「再生成」。
 
-Worker 僅接受 GitHub Pages 網站來源，並設有每個 IP 每分鐘 3 次的近似速率限制。OpenAI 圖像生成可能產生費用；請在 OpenAI 帳戶設定用量上限。未設定 Worker 時，花布仍會使用本機暖白布底。
+Worker 僅接受 GitHub Pages 網站來源，並設有每個 IP 每分鐘 3 次的近似速率限制。OpenAI 圖像生成可能產生費用；請在 OpenAI 帳戶設定用量上限。未設定 Worker 時，花布仍會使用本機紅色布底。

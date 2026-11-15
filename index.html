@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f8f5e9">
-  <title>花鳥蓋印所 — 國風圖樣小遊戲</title>
+  <title>花鳥</title>
   <style>
     :root {
       color-scheme: light;
@@ -37,112 +37,55 @@
     button { font: inherit; }
 
     .page {
-      width: min(1320px, calc(100% - 48px));
-      margin: 0 auto;
-      padding: 30px 0 42px;
+      width: 100%;
+      height: 100vh;
+      height: 100dvh;
+      margin: 0;
+      padding: 0;
     }
 
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 36px;
+    .game-card {
+      width: 100%;
+      height: 100%;
     }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 11px;
-      font-size: 15px;
+    .sidebar {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      z-index: 10;
+      display: grid;
+      width: min(390px, calc(100% - 24px));
+      max-height: calc(100% - 24px);
+      gap: 8px;
+      overflow: auto;
+      padding: 12px;
+      border: 1px solid rgba(115, 93, 72, .2);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, .94);
+      box-shadow: 0 5px 24px rgba(67, 55, 40, .12);
+      backdrop-filter: blur(8px);
+    }
+
+    .section-label {
+      margin: 0;
+      color: #405944;
+      font-size: 16px;
       font-weight: 800;
       letter-spacing: .04em;
     }
 
-    .brand-mark {
-      display: grid;
-      width: 38px;
-      height: 38px;
-      place-items: center;
-      border: 1px solid rgba(169, 54, 43, .48);
-      border-radius: 10px;
-      color: var(--vermilion);
-      background: #fffaf3;
-      box-shadow: inset 0 0 0 3px #fffaf3, inset 0 0 0 4px rgba(169, 54, 43, .28);
-      font-family: "Noto Serif TC", "Songti TC", serif;
-      font-size: 18px;
-      font-weight: 800;
-    }
-
-    .season-tag {
-      padding: 8px 13px;
-      border: 1px solid rgba(83, 106, 73, .15);
-      border-radius: 99px;
-      color: #65735d;
-      background: rgba(255, 253, 246, .62);
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: .07em;
-    }
-
-    .intro {
-      margin-bottom: 27px;
-      text-align: center;
-    }
-
-    .eyebrow {
-      margin: 0 0 8px;
-      color: #82916f;
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: .2em;
-    }
-
-    h1 {
-      margin: 0;
-      color: #304b38;
-      font-family: Georgia, "Noto Serif TC", serif;
-      font-size: clamp(32px, 5vw, 48px);
-      font-weight: 700;
-      letter-spacing: .06em;
-    }
-
-    .subtitle {
-      margin: 10px 0 0;
-      color: #7d8578;
-      font-size: 14px;
-      letter-spacing: .035em;
-    }
-
-    .game-card {
-      display: grid;
-      grid-template-columns: 240px minmax(0, 1fr);
-      gap: 18px;
-      padding: 0;
-    }
-
-    .sidebar {
-      display: flex;
-      flex-direction: column;
-      padding: 18px 8px 12px 10px;
-    }
-
-    .section-label {
-      margin: 0 0 13px;
-      color: #75816d;
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: .15em;
-    }
+    .control-head { display: flex; align-items: center; gap: 10px; }
 
     .pattern-list {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 9px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 6px;
     }
 
     .pattern-option {
       display: flex;
-      min-height: 82px;
+      min-height: 64px;
       flex-direction: column;
       align-items: center;
       justify-content: center;
@@ -168,73 +111,70 @@
     .pattern-list[hidden], .pattern-option[hidden], .target[hidden], .fabric-output[hidden], .download[hidden] { display: none; }
 
     .pattern-preview {
-      width: 42px;
-      height: 42px;
+      width: 36px;
+      height: 36px;
       border: 1px solid #e8d6c6;
       border-radius: 50%;
       background: #fff;
       object-fit: cover;
     }
 
-    .pattern-name { color: #685344; font-size: 11px; font-weight: 700; }
+    .pattern-name { color: #685344; font-size: 10px; font-weight: 700; }
 
     .instruction {
-      margin: 19px 0 0;
-      padding: 13px 14px;
-      border-radius: 14px;
+      margin: 0;
       color: #64715e;
-      background: #f1f1e5;
       font-size: 12px;
-      line-height: 1.8;
+      line-height: 1.4;
     }
 
     .instruction strong { color: #405944; }
 
     .game-status {
-      min-height: 34px;
-      margin: 10px 0 0;
+      min-height: 0;
+      margin: 0;
       color: #8b5c4c;
       font-size: 11px;
-      line-height: 1.6;
+      line-height: 1.4;
     }
 
     .progress-card {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      margin-top: auto;
-      padding: 17px 3px 4px;
+      gap: 6px;
+      margin-left: auto;
+      padding: 0;
     }
 
     .progress-label {
       color: #7b8476;
-      font-size: 12px;
+      font-size: 11px;
     }
 
     .progress-count {
       color: #476448;
       font-family: Georgia, serif;
-      font-size: 22px;
+      font-size: 17px;
       font-weight: 700;
     }
 
     .progress-count small {
       color: #9aa091;
       font-family: inherit;
-      font-size: 14px;
+      font-size: 11px;
       font-weight: 400;
     }
 
     .reset {
-      width: 100%;
-      margin-top: 9px;
-      padding: 10px 14px;
+      width: auto;
+      margin: 0;
+      padding: 6px 10px;
       border: 1px solid #dfe3d3;
-      border-radius: 12px;
+      border-radius: 9px;
       color: #65745f;
-      background: transparent;
+      background: #fff;
       cursor: pointer;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
       transition: background .18s ease;
     }
@@ -242,11 +182,12 @@
     .reset:hover { background: #f2f3e9; }
 
     .finish-leaves {
-      width: 100%;
-      margin-top: 9px;
-      padding: 11px 14px;
+      justify-self: start;
+      width: auto;
+      margin: 0;
+      padding: 7px 14px;
       border: 0;
-      border-radius: 12px;
+      border-radius: 9px;
       color: #fffaf3;
       background: var(--vermilion);
       cursor: pointer;
@@ -260,15 +201,15 @@
 
     .fabric-output {
       display: grid;
-      gap: 8px;
-      margin-top: 16px;
+      gap: 7px;
+      margin: 0;
       text-align: center;
     }
 
     .fabric-preview {
       display: block;
       width: 100%;
-      max-height: 190px;
+      max-height: min(30vh, 190px);
       border: 1px solid #e8ded1;
       object-fit: contain;
       background: #fffaf0;
@@ -278,13 +219,20 @@
       margin: 0;
       color: #788274;
       font-size: 11px;
-      line-height: 1.6;
+      line-height: 1.4;
     }
 
     .fabric-ai-settings {
       display: grid;
       gap: 6px;
       text-align: left;
+    }
+
+    .fabric-ai-settings summary {
+      color: #65745f;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 700;
     }
 
     .fabric-ai-settings label {
@@ -313,8 +261,8 @@
 
     .download {
       display: block;
-      padding: 10px 12px;
-      border-radius: 12px;
+      padding: 8px 12px;
+      border-radius: 9px;
       color: #fffaf3;
       background: var(--vermilion);
       font-size: 12px;
@@ -324,7 +272,9 @@
 
     .garden {
       position: relative;
-      min-height: max(560px, min(76vh, 760px));
+      width: 100%;
+      height: 100%;
+      min-height: 0;
       overflow: hidden;
       background: var(--paper);
       isolation: isolate;
@@ -375,41 +325,6 @@
       opacity: .18;
       pointer-events: none;
     }
-
-    .garden-note {
-      position: absolute;
-      top: 21px;
-      left: 23px;
-      z-index: 1;
-      color: #8d5c4c;
-      font-family: Georgia, "Noto Serif TC", serif;
-      font-size: 12px;
-      letter-spacing: .12em;
-      pointer-events: none;
-    }
-
-    .garden-note span {
-      display: block;
-      margin-top: 4px;
-      color: #a1816a;
-      font-family: "Avenir Next", Avenir, "Noto Sans TC", sans-serif;
-      font-size: 10px;
-      letter-spacing: .08em;
-    }
-
-    .leaf-decoration {
-      position: absolute;
-      z-index: -1;
-      color: rgba(169, 54, 43, .1);
-      font-family: "Noto Serif TC", "Songti TC", serif;
-      font-size: 82px;
-      line-height: 1;
-      pointer-events: none;
-      user-select: none;
-    }
-
-    .leaf-one { right: 16px; bottom: 12px; transform: rotate(-15deg); }
-    .leaf-two { top: 54px; right: 40px; transform: rotate(8deg) scale(.58); }
 
     .target {
       position: absolute;
@@ -537,14 +452,6 @@
 
     .garden.complete .complete-message { opacity: 1; transform: translateY(0); }
 
-    .footer-note {
-      margin: 17px 0 0;
-      color: #929687;
-      font-size: 11px;
-      text-align: center;
-      letter-spacing: .04em;
-    }
-
     @keyframes breathe {
       0%, 100% { opacity: .65; transform: scale(.94); }
       50% { opacity: 1; transform: scale(1.05); }
@@ -557,19 +464,9 @@
     }
 
     @media (max-width: 760px) {
-      .page { width: min(600px, calc(100% - 28px)); padding-top: 18px; }
-      .topbar { margin-bottom: 27px; }
-      .game-card { grid-template-columns: 1fr; gap: 10px; padding: 14px; }
-      .sidebar { padding: 8px 3px 0; }
-      .pattern-list { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
-      .pattern-option { min-height: 74px; border-radius: 10px; }
-      .pattern-preview { width: 38px; height: 38px; }
-      .pattern-name { font-size: 10px; }
-      .instruction { margin-top: 12px; padding: 9px 12px; }
-      .progress-card { padding-top: 10px; }
-      .reset { margin-top: 5px; }
-      .fabric-output { max-width: 280px; margin: 14px auto 0; }
-      .garden { min-height: max(480px, min(72vh, 680px)); }
+      .sidebar { top: 8px; left: 8px; width: min(360px, calc(100% - 16px)); max-height: calc(100% - 16px); padding: 9px; gap: 6px; }
+      .pattern-option { min-height: 56px; gap: 3px; }
+      .pattern-preview { width: 32px; height: 32px; }
       .target { width: 84px; height: 84px; }
       .target-stamp { width: 74px; height: 74px; }
       .stamp-image, .target.stamped .stamp-image {
@@ -579,14 +476,12 @@
     }
 
     @media (max-width: 430px) {
-      .page { width: calc(100% - 20px); }
-      .game-card { padding: 10px; }
+      .sidebar { width: min(340px, calc(100% - 16px)); }
       .pattern-list { gap: 4px; }
-      .pattern-option { min-height: 66px; padding: 5px 2px; }
-      .pattern-preview { width: 34px; height: 34px; }
+      .pattern-option { min-height: 50px; padding: 4px 2px; }
+      .pattern-preview { width: 28px; height: 28px; }
       .pattern-name { font-size: 9px; }
-      .garden { min-height: max(420px, min(72vh, 620px)); }
-      .garden-note { top: 15px; left: 16px; }
+      .section-label { font-size: 14px; }
       .target { width: 74px; height: 74px; }
       .target-stamp { width: 66px; height: 66px; }
       .stamp-image, .target.stamped .stamp-image {
@@ -607,93 +502,78 @@
 </head>
 <body>
   <main class="page">
-    <header class="topbar">
-      <div class="brand"><span class="brand-mark" aria-hidden="true">印</span><span>紙上花園</span></div>
-      <span class="season-tag">花鳥小集 · 春</span>
-    </header>
-
-    <section class="intro" aria-labelledby="game-title">
-      <p class="eyebrow">A LITTLE GARDEN OF SEALS</p>
-      <h1 id="game-title">花鳥蓋印所</h1>
-      <p class="subtitle">依序用筆刷畫葉、蓋下 5 朵花，再蓋 2 隻小鳥，織成專屬花布。</p>
-    </section>
-
-    <section class="game-card" aria-label="花鳥蓋印遊戲">
-      <aside class="sidebar">
-        <h2 class="section-label" id="stage-heading">01　用葉片筆刷自由描畫</h2>
-        <div class="pattern-list" role="group" aria-label="選擇蓋印圖樣">
-          <button class="pattern-option" type="button" data-kind="flower" data-image="crocus-1279508_1280.webp" data-name="紫花" aria-pressed="false" aria-label="選擇紫花圖樣">
-            <img class="pattern-preview" src="crocus-1279508_1280.webp" alt=""><span class="pattern-name">紫花</span>
-          </button>
-          <button class="pattern-option" type="button" data-kind="leaf" data-image="9ae5cb84d561e853cb062901367e86f4.png" data-name="青葉" aria-pressed="false" aria-label="選擇青葉圖樣">
-            <img class="pattern-preview" src="9ae5cb84d561e853cb062901367e86f4.png" alt=""><span class="pattern-name">青葉</span>
-          </button>
-          <button class="pattern-option" type="button" data-kind="bird" data-image="pngtree-small-cute-bird-png-image_9959508.png" data-name="雀鳥" aria-pressed="false" aria-label="選擇雀鳥圖樣">
-            <img class="pattern-preview" src="pngtree-small-cute-bird-png-image_9959508.png" alt=""><span class="pattern-name">雀鳥</span>
-          </button>
-          <button class="pattern-option" type="button" data-kind="flower" data-image="pngtree-mugunghwa-pink-flower-of-korea-png-png-image_11494956.png" data-name="木槿" aria-pressed="false" aria-label="選擇木槿圖樣">
-            <img class="pattern-preview" src="pngtree-mugunghwa-pink-flower-of-korea-png-png-image_11494956.png" alt=""><span class="pattern-name">木槿</span>
-          </button>
-        </div>
-
-        <p class="instruction" id="stage-instruction">選擇葉片後，在白紙上移動滑鼠自由描畫。完成後按 OK 前往下一步。</p>
-        <p class="game-status" id="game-status" role="status">先選一款葉片圖樣，再在紙上描畫。</p>
-        <button class="finish-leaves" id="finish-leaves" type="button" disabled hidden>OK，完成葉片並進入花朵</button>
-
-        <div class="progress-card" aria-live="polite">
-          <span class="progress-label" id="progress-label">花朵</span>
-          <span class="progress-count"><span id="stamped-count">0</span><small id="stage-total"> / 5</small></span>
-        </div>
-        <button class="reset" id="reset-game" type="button">↻　重新開始</button>
-        <section class="fabric-output" id="fabric-output" aria-label="花布 JPG" hidden>
-          <img class="fabric-preview" id="fabric-preview" alt="依蓋印圖樣生成的重複花布預覽">
-          <p class="fabric-status" id="fabric-status" role="status">正在生成花布圖樣……</p>
-          <a class="download" id="fabric-download" download="花鳥重複花布.jpg" hidden>下載花布 JPG</a>
-          <div class="fabric-ai-settings">
-            <label for="fabric-ai-endpoint">AI 花布 Worker 網址</label>
-            <input id="fabric-ai-endpoint" type="url" inputmode="url" placeholder="https://你的-worker.workers.dev" autocomplete="url">
-            <button class="reset" id="save-fabric-ai-endpoint" type="button">儲存 AI 網址</button>
-            <small>只生成布底；畫紙印記留在本機疊回。API 金鑰不需填在此處。</small>
+    <section class="game-card" aria-label="花鳥蓋印">
+      <div class="garden" id="garden" aria-label="畫紙">
+        <aside class="sidebar" aria-label="操作">
+          <div class="control-head">
+            <h2 class="section-label" id="stage-heading">葉</h2>
+            <div class="progress-card" aria-live="polite">
+              <span class="progress-label" id="progress-label">進度</span>
+              <span class="progress-count"><span id="stamped-count">0</span><small id="stage-total"> 片</small></span>
+            </div>
+            <button class="reset" id="reset-game" type="button">重來</button>
           </div>
-          <button class="reset" id="generate-fabric" type="button">重新生成花布</button>
-        </section>
-      </aside>
-
-      <div class="garden" id="garden" aria-label="花鳥印箋；花鳥停留一秒蓋印，葉片階段可用滑鼠自由描畫">
-        <div class="garden-note">花鳥印箋<span>循序蓋印：葉筆刷、花五朵、鳥兩隻</span></div>
-        <span class="leaf-decoration leaf-one" aria-hidden="true">印</span>
-        <span class="leaf-decoration leaf-two" aria-hidden="true">花</span>
+          <div class="pattern-list" role="group" aria-label="選圖">
+            <button class="pattern-option" type="button" data-kind="flower" data-image="crocus-1279508_1280.webp" data-name="紫花" aria-pressed="false" aria-label="紫花">
+              <img class="pattern-preview" src="crocus-1279508_1280.webp" alt=""><span class="pattern-name">紫花</span>
+            </button>
+            <button class="pattern-option" type="button" data-kind="leaf" data-image="9ae5cb84d561e853cb062901367e86f4.png" data-name="青葉" aria-pressed="false" aria-label="青葉">
+              <img class="pattern-preview" src="9ae5cb84d561e853cb062901367e86f4.png" alt=""><span class="pattern-name">青葉</span>
+            </button>
+            <button class="pattern-option" type="button" data-kind="bird" data-image="pngtree-small-cute-bird-png-image_9959508.png" data-name="雀鳥" aria-pressed="false" aria-label="雀鳥">
+              <img class="pattern-preview" src="pngtree-small-cute-bird-png-image_9959508.png" alt=""><span class="pattern-name">雀鳥</span>
+            </button>
+            <button class="pattern-option" type="button" data-kind="flower" data-image="pngtree-mugunghwa-pink-flower-of-korea-png-png-image_11494956.png" data-name="木槿" aria-pressed="false" aria-label="木槿">
+              <img class="pattern-preview" src="pngtree-mugunghwa-pink-flower-of-korea-png-png-image_11494956.png" alt=""><span class="pattern-name">木槿</span>
+            </button>
+          </div>
+          <p class="instruction" id="stage-instruction">選葉，拖畫；完成後按「完成」。</p>
+          <p class="game-status" id="game-status" role="status">選一款葉片。</p>
+          <button class="finish-leaves" id="finish-leaves" type="button" disabled hidden>完成</button>
+          <section class="fabric-output" id="fabric-output" aria-label="花布" hidden>
+            <img class="fabric-preview" id="fabric-preview" alt="花布預覽">
+            <p class="fabric-status" id="fabric-status" role="status">製作中…</p>
+            <a class="download" id="fabric-download" download="花鳥重複花布.jpg" hidden>下載 JPG</a>
+            <details class="fabric-ai-settings">
+              <summary>AI 布底</summary>
+              <label for="fabric-ai-endpoint">Worker 網址</label>
+              <input id="fabric-ai-endpoint" type="url" inputmode="url" placeholder="https://…" autocomplete="url">
+              <button class="reset" id="save-fabric-ai-endpoint" type="button">儲存</button>
+              <small>畫紙圖樣留在本機；API 金鑰勿貼在此處。</small>
+            </details>
+            <button class="reset" id="generate-fabric" type="button">再生成</button>
+          </section>
+        </aside>
         <canvas class="leaf-canvas" id="leaf-canvas" aria-label="自由繪製葉片的畫紙區" hidden></canvas>
-        <span class="leaf-guide" style="left:19%;top:32%" aria-hidden="true"></span>
-        <span class="leaf-guide" style="left:42%;top:26%" aria-hidden="true"></span>
-        <span class="leaf-guide" style="left:70%;top:35%" aria-hidden="true"></span>
+        <span class="leaf-guide" style="left:19%;top:40%" aria-hidden="true"></span>
+        <span class="leaf-guide" style="left:42%;top:42%" aria-hidden="true"></span>
+        <span class="leaf-guide" style="left:70%;top:40%" aria-hidden="true"></span>
         <span class="leaf-guide" style="left:31%;top:67%" aria-hidden="true"></span>
         <span class="leaf-guide" style="left:79%;top:70%" aria-hidden="true"></span>
-        <button class="target" type="button" data-stage="flower" style="left:19%;top:28%" aria-label="尚未蓋印的花朵位置一">
+        <button class="target" type="button" data-stage="flower" style="left:19%;top:40%" aria-label="花一">
           <span class="target-glow" aria-hidden="true"></span><span class="target-progress" aria-hidden="true"></span><span class="target-stamp" aria-hidden="true"><img class="stamp-image" alt=""></span>
         </button>
-        <button class="target" type="button" data-stage="flower" style="left:45%;top:22%" aria-label="尚未蓋印的花朵位置二">
+        <button class="target" type="button" data-stage="flower" style="left:45%;top:42%" aria-label="花二">
           <span class="target-glow" aria-hidden="true"></span><span class="target-progress" aria-hidden="true"></span><span class="target-stamp" aria-hidden="true"><img class="stamp-image" alt=""></span>
         </button>
-        <button class="target" type="button" data-stage="flower" style="left:72%;top:29%" aria-label="尚未蓋印的花朵位置三">
+        <button class="target" type="button" data-stage="flower" style="left:72%;top:40%" aria-label="花三">
           <span class="target-glow" aria-hidden="true"></span><span class="target-progress" aria-hidden="true"></span><span class="target-stamp" aria-hidden="true"><img class="stamp-image" alt=""></span>
         </button>
-        <button class="target" type="button" data-stage="flower" style="left:83%;top:50%" aria-label="尚未蓋印的花朵位置四">
+        <button class="target" type="button" data-stage="flower" style="left:83%;top:56%" aria-label="花四">
           <span class="target-glow" aria-hidden="true"></span><span class="target-progress" aria-hidden="true"></span><span class="target-stamp" aria-hidden="true"><img class="stamp-image" alt=""></span>
         </button>
-        <button class="target" type="button" data-stage="flower" style="left:30%;top:58%" aria-label="尚未蓋印的花朵位置五">
+        <button class="target" type="button" data-stage="flower" style="left:30%;top:64%" aria-label="花五">
           <span class="target-glow" aria-hidden="true"></span><span class="target-progress" aria-hidden="true"></span><span class="target-stamp" aria-hidden="true"><img class="stamp-image" alt=""></span>
         </button>
-        <button class="target" type="button" data-stage="bird" style="left:32%;top:43%" aria-label="尚未蓋印的小鳥位置一">
+        <button class="target" type="button" data-stage="bird" style="left:32%;top:48%" aria-label="鳥一">
           <span class="target-glow" aria-hidden="true"></span><span class="target-progress" aria-hidden="true"></span><span class="target-stamp" aria-hidden="true"><img class="stamp-image" alt=""></span>
         </button>
-        <button class="target" type="button" data-stage="bird" style="left:74%;top:58%" aria-label="尚未蓋印的小鳥位置二">
+        <button class="target" type="button" data-stage="bird" style="left:74%;top:63%" aria-label="鳥二">
           <span class="target-glow" aria-hidden="true"></span><span class="target-progress" aria-hidden="true"></span><span class="target-stamp" aria-hidden="true"><img class="stamp-image" alt=""></span>
         </button>
-        <div class="complete-message" role="status">花鳥印譜完成，花布已織成！</div>
+        <div class="complete-message" role="status">完成</div>
       </div>
     </section>
-    <p class="footer-note">以花為箋，以鳥為印，慢慢留住一方春意。</p>
   </main>
 
   <script>
@@ -727,9 +607,9 @@
     }
     fabricAiEndpointInput.value = fabricAiEndpoint;
     const stages = [
-      { key: "leaf", kind: "leaf", name: "葉片", heading: "01　用葉片筆刷自由描畫", count: null },
-      { key: "flower", kind: "flower", name: "花朵", heading: "02　選一款花樣，再蓋 5 朵花", count: 5 },
-      { key: "bird", kind: "bird", name: "小鳥", heading: "03　選一款鳥樣，再蓋 2 隻小鳥", count: 2 }
+      { key: "leaf", kind: "leaf", name: "葉", heading: "葉", count: null },
+      { key: "flower", kind: "flower", name: "花", heading: "花", count: 5 },
+      { key: "bird", kind: "bird", name: "鳥", heading: "鳥", count: 2 }
     ];
     let stageIndex = 0;
     let selectedPattern = null;
@@ -770,11 +650,11 @@
       });
 
       if (complete) {
-        stageHeading.textContent = "04　花布完成";
-        progressLabel.textContent = "全部印記";
+        stageHeading.textContent = "完成";
+        progressLabel.textContent = "進度";
         countLabel.textContent = String(7 + leafMarks.length);
-        stageTotal.textContent = " 枚印記";
-        stageInstruction.textContent = "花朵、葉片筆刷與小鳥都完成了，正在把你的圖樣排成花布。";
+        stageTotal.textContent = " 枚";
+        stageInstruction.textContent = "花布完成。";
         return;
       }
 
@@ -782,16 +662,16 @@
         target.dataset.stage === stage.key && target.classList.contains("stamped")
       ).length;
       stageHeading.textContent = stage.heading;
-      progressLabel.textContent = stage.name;
+      progressLabel.textContent = "進度";
       countLabel.textContent = String(stage.key === "leaf" ? leafMarks.length : stampedInStage);
-      stageTotal.textContent = stage.count === null ? " 片已畫" : ` / ${stage.count}`;
+      stageTotal.textContent = stage.count === null ? " 片" : ` / ${stage.count}`;
       if (stage.key === "leaf") {
-        stageInstruction.innerHTML = `選擇葉片後，在白紙上移動滑鼠自由描畫；葉片大小隨機為 ${minLeafBrushSize}–${maxLeafBrushSize}px，葉與葉間距 <strong>${leafBrushGap}px</strong>。完成後按 OK 前往下一步。`;
+        stageInstruction.textContent = "選葉，拖畫；完成後按「完成」。";
         return;
       }
       stageInstruction.innerHTML = selectedPattern
-        ? `將滑鼠停在紙上的光點 <strong>1 秒</strong>蓋印；每枚印記大小略有不同。`
-        : "先選一款圖樣，再將滑鼠停在紙上的光點 <strong>1 秒</strong>蓋印；印記大小略有不同。";
+        ? `停在紅圈 <strong>1 秒</strong>。`
+        : "選圖，停在紅圈 1 秒。";
     }
 
     patternButtons.forEach((button) => {
@@ -803,13 +683,11 @@
         };
         updateStageView();
         const chosenPattern = selectedPattern;
-        gameStatus.textContent = `正在準備「${chosenPattern.name}」圖樣……`;
+        gameStatus.textContent = "載入中…";
         try {
           await loadArtImage(chosenPattern.image);
           if (selectedPattern !== chosenPattern) return;
-          gameStatus.textContent = stages[stageIndex]?.key === "leaf"
-            ? `已選「${chosenPattern.name}」葉片；在白紙上移動滑鼠即可繪畫。`
-            : `已選「${chosenPattern.name}」，把滑鼠移到紙上的光點停留 1 秒。`;
+          gameStatus.textContent = stages[stageIndex]?.key === "leaf" ? "拖動畫葉。" : "停在紅圈蓋印。";
         } catch (error) {
           if (selectedPattern === chosenPattern) gameStatus.textContent = `圖樣載入失敗：${error.message}`;
         }
@@ -872,16 +750,19 @@
       leafMarks.push(mark);
       drawLeafMark(mark);
       countLabel.textContent = String(leafMarks.length);
-      stageTotal.textContent = " 片已畫";
+      stageTotal.textContent = " 片";
       finishLeavesButton.disabled = false;
       if (leafMarks.length === 1 || leafMarks.length % 20 === 0) {
-        gameStatus.textContent = `葉片筆刷已畫 ${leafMarks.length} 片；完成後按 OK 前往花朵。`;
+        gameStatus.textContent = `已畫 ${leafMarks.length} 片。`;
       }
       return mark;
     }
 
     function paintLeafAtPointer(event) {
-      if (stages[stageIndex]?.key !== "leaf" || !selectedPattern || !loadedArtImages.has(selectedPattern.image)) return;
+      if (event.target.closest(".sidebar")
+        || stages[stageIndex]?.key !== "leaf"
+        || !selectedPattern
+        || !loadedArtImages.has(selectedPattern.image)) return;
       const bounds = garden.getBoundingClientRect();
       const edgeMargin = maxLeafBrushSize / 2;
       const current = {
@@ -946,7 +827,7 @@
       if (target.hidden || target.disabled || target.classList.contains("stamped") || target.stampFrame) return;
       if (!stage || target.dataset.stage !== stage.key) return;
       if (!selectedPattern) {
-        gameStatus.textContent = `先選擇${stage.name}圖樣，再開始蓋印。`;
+        gameStatus.textContent = "先選圖。";
         return;
       }
       const startedAt = performance.now();
@@ -991,7 +872,7 @@
       ).length;
       if (stampedInStage < stage.count) {
         updateStageView();
-        gameStatus.textContent = `已蓋 ${stampedInStage} / ${stage.count}；本階段圖樣已選定，繼續尋找光點。`;
+        gameStatus.textContent = `${stampedInStage} / ${stage.count}`;
         return;
       }
 
@@ -1001,10 +882,10 @@
       updateStageView();
       if (stageIndex === stages.length) {
         garden.classList.add("complete");
-        gameStatus.textContent = "花、葉與小鳥都完成了，正在本機生成重複花布 JPG。";
+        gameStatus.textContent = "製作花布…";
         generateAndShowFabric();
       } else {
-        gameStatus.textContent = `${stage.name}完成！接著選擇${stages[stageIndex].name}圖樣。`;
+        gameStatus.textContent = `完成，選${stages[stageIndex].name}。`;
       }
     }
 
@@ -1029,7 +910,7 @@
       lastBrushSize = 0;
       nextLeafBrushSize = null;
       updateStageView();
-      gameStatus.textContent = `葉片完成，共畫了 ${leafMarks.length} 片；接著選一款花樣。`;
+      gameStatus.textContent = `完成 ${leafMarks.length} 片。`;
     });
 
     function loadArtImage(src) {
@@ -1054,7 +935,7 @@
         try {
           window.localStorage.removeItem(fabricAiEndpointStorageKey);
           fabricAiEndpoint = "";
-          fabricStatus.textContent = "已清除 AI Worker 網址；重新生成時會使用本機布底。";
+          fabricStatus.textContent = "已清除。";
         } catch (error) {
           fabricStatus.textContent = `無法清除 AI Worker 設定：${error.message}`;
         }
@@ -1065,18 +946,18 @@
       try {
         endpoint = new URL(value);
       } catch {
-        fabricStatus.textContent = "Worker 網址格式無效，請輸入完整的 https:// 網址。";
+        fabricStatus.textContent = "網址無效。";
         return;
       }
       if (endpoint.protocol !== "https:" || endpoint.pathname !== "/" || endpoint.search || endpoint.hash) {
-        fabricStatus.textContent = "請輸入 Worker 根網址，例如 https://nature-fabric-ai.example.workers.dev。";
+        fabricStatus.textContent = "請輸入 Worker 根網址。";
         return;
       }
 
       try {
         window.localStorage.setItem(fabricAiEndpointStorageKey, endpoint.origin);
         fabricAiEndpoint = endpoint.origin;
-        fabricStatus.textContent = "AI Worker 網址已儲存在此瀏覽器；按「重新生成花布」開始生成 AI 布底。";
+        fabricStatus.textContent = "已儲存。";
       } catch (error) {
         fabricStatus.textContent = `無法儲存 AI Worker 設定：${error.message}`;
       }
@@ -1208,9 +1089,7 @@
     async function generateAndShowFabric() {
       const generation = ++fabricGeneration;
       generateFabricButton.disabled = true;
-      fabricStatus.textContent = fabricAiEndpoint
-        ? "正在生成 AI 布底；畫紙印記會留在本機疊回……"
-        : "正在本機排列圖樣；連接 AI Worker 後可使用 AI 布底……";
+      fabricStatus.textContent = "製作中…";
       try {
         const backgroundImage = fabricAiEndpoint ? await generateAIFabricBackground() : null;
         const blob = await createFabricJpg(backgroundImage);
@@ -1220,9 +1099,7 @@
         fabricPreview.src = fabricObjectUrl;
         fabricDownload.href = fabricObjectUrl;
         fabricDownload.hidden = false;
-        fabricStatus.textContent = backgroundImage
-          ? "AI 布底已生成；畫紙上的葉、花、鳥圖案與比例由本機重複疊回，可下載保存。"
-          : "本機花布已生成；設定 AI Worker 網址後按「重新生成花布」即可使用 AI 布底。";
+        fabricStatus.textContent = backgroundImage ? "完成（AI 布底）。" : "完成。";
       } catch (error) {
         if (generation === fabricGeneration) fabricStatus.textContent = `花布生成失敗：${error.message}`;
       } finally {
@@ -1243,7 +1120,7 @@
         stampImage.removeAttribute("src");
         stampImage.alt = "";
         delete target.dataset.image;
-        target.setAttribute("aria-label", `尚未蓋印的位置${targets.indexOf(target) + 1}`);
+        target.setAttribute("aria-label", `位置${targets.indexOf(target) + 1}`);
         target.removeAttribute("aria-pressed");
         target.disabled = false;
         target.style.removeProperty("--progress");
@@ -1264,8 +1141,8 @@
       lastBrushSize = 0;
       nextLeafBrushSize = null;
       resizeLeafCanvas();
-      fabricStatus.textContent = "完成蓋印後，會在此生成花布 JPG。";
-      gameStatus.textContent = "選好花樣就開始蓋印。";
+      fabricStatus.textContent = "製作中…";
+      gameStatus.textContent = "選一款葉片。";
       garden.classList.remove("complete");
       updateStageView();
     });

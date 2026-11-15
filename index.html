@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f5e9">
+  <title>菜園蓋印所 — 蔬菜小遊戲</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "Avenir Next", Avenir, "Noto Sans TC", "PingFang TC", sans-serif;
+      color: #293d31;
+      background: #f8f5e9;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      --leaf: #64845c;
+      --deep-leaf: #37563f;
+      --paper: #fffdf6;
+      --muted: #788274;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      background:
+        radial-gradient(ellipse at 8% 8%, rgba(223, 229, 197, .58), transparent 34rem),
+        radial-gradient(ellipse at 92% 88%, rgba(239, 218, 180, .38), transparent 33rem),
+        #f8f5e9;
+    }
+
+    button { font: inherit; }
+
+    .page {
+      width: min(1120px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: 30px 0 42px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 36px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: .04em;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      border: 1px solid rgba(55, 86, 63, .16);
+      border-radius: 50%;
+      background: #e8edda;
+      font-size: 21px;
+    }
+
+    .season-tag {
+      padding: 8px 13px;
+      border: 1px solid rgba(83, 106, 73, .15);
+      border-radius: 99px;
+      color: #65735d;
+      background: rgba(255, 253, 246, .62);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .07em;
+    }
+
+    .intro {
+      margin-bottom: 27px;
+      text-align: center;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: #82916f;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .2em;
+    }
+
+    h1 {
+      margin: 0;
+      color: #304b38;
+      font-family: Georgia, "Noto Serif TC", serif;
+      font-size: clamp(32px, 5vw, 48px);
+      font-weight: 700;
+      letter-spacing: .06em;
+    }
+
+    .subtitle {
+      margin: 10px 0 0;
+      color: #7d8578;
+      font-size: 14px;
+      letter-spacing: .035em;
+    }
+
+    .game-card {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 24px;
+      padding: 18px;
+      border: 1px solid rgba(79, 99, 69, .13);
+      border-radius: 26px;
+      background: rgba(255, 253, 246, .72);
+      box-shadow: 0 18px 55px rgba(67, 75, 48, .09);
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      padding: 18px 8px 12px 10px;
+    }
+
+    .section-label {
+      margin: 0 0 13px;
+      color: #75816d;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .15em;
+    }
+
+    .veggie-list {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 9px;
+    }
+
+    .veggie {
+      display: flex;
+      min-height: 76px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 7px 3px;
+      border: 1px solid #e8e8d9;
+      border-radius: 15px;
+      color: #596653;
+      background: #fffef9;
+      cursor: pointer;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
+    }
+
+    .veggie:hover { transform: translateY(-2px); }
+
+    .veggie[aria-pressed="true"] {
+      border-color: #829b6e;
+      background: #f0f3e7;
+      box-shadow: 0 0 0 2px rgba(130, 155, 110, .13);
+    }
+
+    .veggie-emoji { font-size: 27px; line-height: 1; }
+    .veggie-name { font-size: 11px; font-weight: 700; }
+
+    .instruction {
+      margin: 19px 0 0;
+      padding: 13px 14px;
+      border-radius: 14px;
+      color: #64715e;
+      background: #f1f1e5;
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    .instruction strong { color: #405944; }
+
+    .progress-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto;
+      padding: 17px 3px 4px;
+    }
+
+    .progress-label {
+      color: #7b8476;
+      font-size: 12px;
+    }
+
+    .progress-count {
+      color: #476448;
+      font-family: Georgia, serif;
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .progress-count small {
+      color: #9aa091;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 400;
+    }
+
+    .reset {
+      width: 100%;
+      margin-top: 9px;
+      padding: 10px 14px;
+      border: 1px solid #dfe3d3;
+      border-radius: 12px;
+      color: #65745f;
+      background: transparent;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      transition: background .18s ease;
+    }
+
+    .reset:hover { background: #f2f3e9; }
+
+    .garden {
+      position: relative;
+      min-height: 500px;
+      overflow: hidden;
+      border: 1px solid rgba(98, 116, 77, .12);
+      border-radius: 20px;
+      background:
+        radial-gradient(ellipse at 18% 82%, rgba(205, 216, 173, .35), transparent 33%),
+        radial-gradient(ellipse at 83% 18%, rgba(222, 226, 190, .35), transparent 34%),
+        linear-gradient(145deg, #f8f6e9 0%, #f1f1df 100%);
+      isolation: isolate;
+    }
+
+    .garden::before {
+      position: absolute;
+      z-index: -1;
+      inset: 0;
+      background-image: radial-gradient(rgba(99, 111, 76, .12) .7px, transparent .7px);
+      background-size: 13px 13px;
+      content: "";
+      opacity: .4;
+      pointer-events: none;
+    }
+
+    .garden-note {
+      position: absolute;
+      top: 21px;
+      left: 23px;
+      z-index: 1;
+      color: #8b927e;
+      font-family: Georgia, "Noto Serif TC", serif;
+      font-size: 12px;
+      letter-spacing: .12em;
+      pointer-events: none;
+    }
+
+    .garden-note span {
+      display: block;
+      margin-top: 4px;
+      color: #a1a48f;
+      font-family: "Avenir Next", Avenir, "Noto Sans TC", sans-serif;
+      font-size: 10px;
+      letter-spacing: .08em;
+    }
+
+    .leaf-decoration {
+      position: absolute;
+      z-index: -1;
+      color: rgba(119, 145, 98, .15);
+      font-size: 116px;
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .leaf-one { right: -17px; bottom: -27px; transform: rotate(-25deg); }
+    .leaf-two { top: 78px; right: 33px; transform: rotate(38deg) scale(.58); }
+
+    .target {
+      position: absolute;
+      display: grid;
+      width: 72px;
+      height: 72px;
+      padding: 0;
+      place-items: center;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      cursor: crosshair;
+      transform: translate(-50%, -50%);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .target:focus-visible {
+      outline: 2px solid #60845a;
+      outline-offset: 3px;
+    }
+
+    .target-glow {
+      position: absolute;
+      inset: 12px;
+      border: 1px dashed rgba(125, 150, 100, .48);
+      border-radius: 50%;
+      background: rgba(228, 236, 208, .48);
+      box-shadow: 0 0 14px 5px rgba(189, 210, 149, .4);
+      animation: breathe 2.4s ease-in-out infinite;
+      transition: opacity .25s ease, transform .25s ease;
+    }
+
+    .target-glow::after {
+      position: absolute;
+      inset: 7px;
+      border: 1px solid rgba(137, 159, 108, .35);
+      border-radius: 50%;
+      content: "";
+    }
+
+    .target-progress {
+      position: absolute;
+      z-index: 1;
+      inset: 0;
+      border-radius: 50%;
+      background: conic-gradient(#66865c calc(var(--progress, 0) * 1%), transparent 0);
+      opacity: .9;
+      -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
+      mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
+      pointer-events: none;
+    }
+
+    .target-stamp {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      width: 55px;
+      height: 55px;
+      place-items: center;
+      border: 1px solid rgba(109, 128, 83, .21);
+      border-radius: 50%;
+      background: rgba(255, 253, 239, .77);
+      box-shadow: 0 3px 10px rgba(84, 98, 64, .1);
+      font-size: 27px;
+      opacity: .45;
+      transform: scale(.7);
+      transition: opacity .25s ease, transform .25s ease;
+      pointer-events: none;
+    }
+
+    .target:not(.stamped):hover .target-glow,
+    .target:not(.stamped):focus-visible .target-glow {
+      transform: scale(1.12);
+    }
+
+    .target.stamped { cursor: default; }
+
+    .target.stamped .target-glow {
+      border-color: rgba(108, 132, 87, .15);
+      background: rgba(221, 231, 199, .17);
+      box-shadow: none;
+      animation: none;
+      opacity: .55;
+    }
+
+    .target.stamped .target-progress { display: none; }
+
+    .target.stamped .target-stamp {
+      border-color: transparent;
+      background: transparent;
+      box-shadow: none;
+      font-size: 42px;
+      opacity: .86;
+      transform: scale(1) rotate(-12deg);
+      animation: stamp-in .42s cubic-bezier(.2, 1.6, .35, 1) both;
+    }
+
+    .target.stamped:nth-of-type(even) .target-stamp { transform: scale(1) rotate(10deg); }
+
+    .complete-message {
+      position: absolute;
+      right: 20px;
+      bottom: 17px;
+      left: 20px;
+      z-index: 2;
+      color: #52724e;
+      font-size: 13px;
+      font-weight: 800;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(5px);
+      transition: opacity .25s ease, transform .25s ease;
+      pointer-events: none;
+    }
+
+    .garden.complete .complete-message { opacity: 1; transform: translateY(0); }
+
+    .footer-note {
+      margin: 17px 0 0;
+      color: #929687;
+      font-size: 11px;
+      text-align: center;
+      letter-spacing: .04em;
+    }
+
+    @keyframes breathe {
+      0%, 100% { opacity: .65; transform: scale(.94); }
+      50% { opacity: 1; transform: scale(1.05); }
+    }
+
+    @keyframes stamp-in {
+      0% { opacity: 0; transform: scale(1.65) rotate(-18deg); }
+      70% { opacity: 1; transform: scale(.88) rotate(5deg); }
+      100% { opacity: .86; transform: scale(1) rotate(-8deg); }
+    }
+
+    @media (max-width: 760px) {
+      .page { width: min(600px, calc(100% - 28px)); padding-top: 18px; }
+      .topbar { margin-bottom: 27px; }
+      .game-card { grid-template-columns: 1fr; gap: 10px; padding: 14px; }
+      .sidebar { padding: 8px 3px 0; }
+      .veggie-list { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+      .veggie { min-height: 66px; border-radius: 12px; }
+      .veggie-emoji { font-size: 24px; }
+      .veggie-name { font-size: 10px; }
+      .instruction { margin-top: 12px; padding: 9px 12px; }
+      .progress-card { padding-top: 10px; }
+      .reset { margin-top: 5px; }
+      .garden { min-height: min(68vh, 500px); }
+      .target { width: 64px; height: 64px; }
+      .target-stamp { width: 49px; height: 49px; font-size: 24px; }
+      .target.stamped .target-stamp { font-size: 37px; }
+    }
+
+    @media (max-width: 430px) {
+      .page { width: calc(100% - 20px); }
+      .game-card { padding: 10px; }
+      .veggie-list { gap: 4px; }
+      .veggie { min-height: 61px; }
+      .veggie-emoji { font-size: 21px; }
+      .veggie-name { font-size: 9px; }
+      .garden { min-height: 390px; }
+      .garden-note { top: 15px; left: 16px; }
+      .target { width: 58px; height: 58px; }
+      .target-stamp { width: 44px; height: 44px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">🌱</span><span>小小自然觀察室</span></div>
+      <span class="season-tag">SPRING · 2026</span>
+    </header>
+
+    <section class="intro" aria-labelledby="game-title">
+      <p class="eyebrow">VEGETABLE STAMP GAME</p>
+      <h1 id="game-title">菜園蓋印所</h1>
+      <p class="subtitle">挑一種喜歡的蔬菜，讓花園長出你的印記吧！</p>
+    </section>
+
+    <section class="game-card" aria-label="蔬菜蓋印遊戲">
+      <aside class="sidebar">
+        <h2 class="section-label">01　挑選你的蔬菜</h2>
+        <div class="veggie-list" role="group" aria-label="選擇蓋印蔬菜">
+          <button class="veggie" type="button" data-emoji="🥕" data-name="紅蘿蔔" aria-pressed="true" aria-label="選擇紅蘿蔔">
+            <span class="veggie-emoji" aria-hidden="true">🥕</span><span class="veggie-name">紅蘿蔔</span>
+          </button>
+          <button class="veggie" type="button" data-emoji="🥦" data-name="花椰菜" aria-pressed="false" aria-label="選擇花椰菜">
+            <span class="veggie-emoji" aria-hidden="true">🥦</span><span class="veggie-name">花椰菜</span>
+          </button>
+          <button class="veggie" type="button" data-emoji="🍆" data-name="茄子" aria-pressed="false" aria-label="選擇茄子">
+            <span class="veggie-emoji" aria-hidden="true">🍆</span><span class="veggie-name">茄子</span>
+          </button>
+          <button class="veggie" type="button" data-emoji="🍅" data-name="番茄" aria-pressed="false" aria-label="選擇番茄">
+            <span class="veggie-emoji" aria-hidden="true">🍅</span><span class="veggie-name">番茄</span>
+          </button>
+          <button class="veggie" type="button" data-emoji="🌽" data-name="玉米" aria-pressed="false" aria-label="選擇玉米">
+            <span class="veggie-emoji" aria-hidden="true">🌽</span><span class="veggie-name">玉米</span>
+          </button>
+          <button class="veggie" type="button" data-emoji="🍄" data-name="蘑菇" aria-pressed="false" aria-label="選擇蘑菇">
+            <span class="veggie-emoji" aria-hidden="true">🍄</span><span class="veggie-name">蘑菇</span>
+          </button>
+        </div>
+
+        <p class="instruction">找到背景裡閃閃發光的小光點，<strong>停留 1 秒</strong>，就能蓋下一枚蔬菜印章喔！</p>
+
+        <div class="progress-card" aria-live="polite">
+          <span class="progress-label">花園印記</span>
+          <span class="progress-count"><span id="stamped-count">0</span><small> / 6</small></span>
+        </div>
+        <button class="reset" id="reset-game" type="button">↻　重新開始</button>
+      </aside>
+
+      <div class="garden" id="garden" aria-label="蓋印花園，移到發光提示點並停留一秒">
+        <div class="garden-note">MY LITTLE GARDEN<span>慢慢尋找發光的小光點</span></div>
+        <span class="leaf-decoration leaf-one" aria-hidden="true">❧</span>
+        <span class="leaf-decoration leaf-two" aria-hidden="true">❧</span>
+        <button class="target" type="button" style="left:19%;top:35%" aria-label="尚未蓋印的位置一">
+          <span class="target-glow" aria-hidden="true"></span><span class="target-progress" aria-hidden="true"></span><span class="target-stamp" aria-hidden="true"></span>
+        </button>
+        <button class="target" type="button" style="left:43%;top:27%" aria-label="尚未蓋印的位置二">
+          <span class="target-glow" aria-hidden="true"></span><span class="target-progress" aria-hidden="true"></span><span class="target-stamp" aria-hidden="true"></span>
+        </button>
+        <button class="target" type="button" style="left:70%;top:37%" aria-label="尚未蓋印的位置三">
+          <span class="target-glow" aria-hidden="true"></span><span class="target-progress" aria-hidden="true"></span><span class="target-stamp" aria-hidden="true"></span>
+        </button>
+        <button class="target" type="button" style="left:29%;top:62%" aria-label="尚未蓋印的位置四">
+          <span class="target-glow" aria-hidden="true"></span><span class="target-progress" aria-hidden="true"></span><span class="target-stamp" aria-hidden="true"></span>
+        </button>
+        <button class="target" type="button" style="left:56%;top:70%" aria-label="尚未蓋印的位置五">
+          <span class="target-glow" aria-hidden="true"></span><span class="target-progress" aria-hidden="true"></span><span class="target-stamp" aria-hidden="true"></span>
+        </button>
+        <button class="target" type="button" style="left:82%;top:63%" aria-label="尚未蓋印的位置六">
+          <span class="target-glow" aria-hidden="true"></span><span class="target-progress" aria-hidden="true"></span><span class="target-stamp" aria-hidden="true"></span>
+        </button>
+        <div class="complete-message" role="status">花園蓋滿印記了！你做得真棒 🌼</div>
+      </div>
+    </section>
+    <p class="footer-note">用一點耐心，種下好多可愛的蔬菜吧</p>
+  </main>
+
+  <script>
+    const veggieButtons = [...document.querySelectorAll(".veggie")];
+    const targets = [...document.querySelectorAll(".target")];
+    const countLabel = document.getElementById("stamped-count");
+    const garden = document.getElementById("garden");
+    const resetButton = document.getElementById("reset-game");
+    let selectedVeggie = { emoji: "🥕", name: "紅蘿蔔" };
+    let stampedCount = 0;
+
+    veggieButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        veggieButtons.forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+        selectedVeggie = { emoji: button.dataset.emoji, name: button.dataset.name };
+      });
+    });
+
+    function stopStamping(target) {
+      if (target.stampFrame) {
+        cancelAnimationFrame(target.stampFrame);
+        target.stampFrame = null;
+      }
+      target.style.removeProperty("--progress");
+    }
+
+    function startStamping(target) {
+      if (target.classList.contains("stamped") || target.stampFrame) return;
+      const startedAt = performance.now();
+
+      function updateProgress(now) {
+        const progress = Math.min((now - startedAt) / 1000, 1);
+        target.style.setProperty("--progress", String(progress * 100));
+        if (progress === 1) {
+          target.stampFrame = null;
+          stamp(target);
+          return;
+        }
+        target.stampFrame = requestAnimationFrame(updateProgress);
+      }
+
+      target.stampFrame = requestAnimationFrame(updateProgress);
+    }
+
+    function stamp(target) {
+      if (target.classList.contains("stamped")) return;
+      target.classList.add("stamped");
+      target.querySelector(".target-stamp").textContent = selectedVeggie.emoji;
+      target.setAttribute("aria-label", `${selectedVeggie.name}印章，已蓋印`);
+      target.setAttribute("aria-pressed", "true");
+      target.disabled = true;
+      target.style.removeProperty("--progress");
+      stampedCount += 1;
+      countLabel.textContent = String(stampedCount);
+      if (stampedCount === targets.length) garden.classList.add("complete");
+    }
+
+    targets.forEach((target) => {
+      target.addEventListener("pointerenter", () => startStamping(target));
+      target.addEventListener("pointerleave", () => {
+        if (!target.classList.contains("stamped")) stopStamping(target);
+      });
+      target.addEventListener("focus", () => startStamping(target));
+      target.addEventListener("blur", () => {
+        if (!target.classList.contains("stamped")) stopStamping(target);
+      });
+    });
+
+    resetButton.addEventListener("click", () => {
+      targets.forEach((target) => {
+        if (target.stampFrame) cancelAnimationFrame(target.stampFrame);
+        target.stampFrame = null;
+        target.classList.remove("stamped");
+        target.querySelector(".target-stamp").textContent = "";
+        target.setAttribute("aria-label", `尚未蓋印的位置${targets.indexOf(target) + 1}`);
+        target.removeAttribute("aria-pressed");
+        target.disabled = false;
+        target.style.removeProperty("--progress");
+      });
+      stampedCount = 0;
+      countLabel.textContent = "0";
+      garden.classList.remove("complete");
+    });
+  </script>
+</body>
+</html>

@@ -16,7 +16,7 @@
       -webkit-font-smoothing: antialiased;
       --leaf: #64845c;
       --deep-leaf: #37563f;
-      --paper: #fffdf6;
+      --paper: #ffffff;
       --muted: #788274;
     }
 
@@ -226,10 +226,7 @@
       overflow: hidden;
       border: 1px solid rgba(98, 116, 77, .12);
       border-radius: 20px;
-      background:
-        radial-gradient(ellipse at 18% 82%, rgba(205, 216, 173, .35), transparent 33%),
-        radial-gradient(ellipse at 83% 18%, rgba(222, 226, 190, .35), transparent 34%),
-        linear-gradient(145deg, #f8f6e9 0%, #f1f1df 100%);
+      background: var(--paper);
       isolation: isolate;
     }
 
@@ -237,10 +234,10 @@
       position: absolute;
       z-index: -1;
       inset: 0;
-      background-image: radial-gradient(rgba(99, 111, 76, .12) .7px, transparent .7px);
-      background-size: 13px 13px;
+      background-image: radial-gradient(rgba(99, 111, 76, .1) .6px, transparent .6px);
+      background-size: 15px 15px;
       content: "";
-      opacity: .4;
+      opacity: .2;
       pointer-events: none;
     }
 
@@ -336,9 +333,9 @@
       width: 55px;
       height: 55px;
       place-items: center;
-      border: 1px solid rgba(109, 128, 83, .21);
+      border: 1px solid #f0eee4;
       border-radius: 50%;
-      background: rgba(255, 253, 239, .77);
+      background: #fff;
       box-shadow: 0 3px 10px rgba(84, 98, 64, .1);
       font-size: 27px;
       opacity: .45;
@@ -365,11 +362,15 @@
     .target.stamped .target-progress { display: none; }
 
     .target.stamped .target-stamp {
-      border-color: transparent;
-      background: transparent;
-      box-shadow: none;
+      border: 3px solid var(--stamp-ink);
+      background: color-mix(in srgb, var(--stamp-ink) 18%, white);
+      box-shadow:
+        inset 0 0 0 2px white,
+        0 0 0 3px color-mix(in srgb, var(--stamp-ink) 42%, white),
+        0 3px 8px rgba(62, 58, 42, .16);
       font-size: 42px;
-      opacity: .86;
+      opacity: 1;
+      filter: saturate(1.4);
       transform: scale(1) rotate(-12deg);
       animation: stamp-in .42s cubic-bezier(.2, 1.6, .35, 1) both;
     }
@@ -471,22 +472,22 @@
       <aside class="sidebar">
         <h2 class="section-label">01　挑選你的蔬菜</h2>
         <div class="veggie-list" role="group" aria-label="選擇蓋印蔬菜">
-          <button class="veggie" type="button" data-emoji="🥕" data-name="紅蘿蔔" aria-pressed="true" aria-label="選擇紅蘿蔔">
+          <button class="veggie" type="button" data-emoji="🥕" data-name="紅蘿蔔" data-ink="#f04438" aria-pressed="true" aria-label="選擇紅蘿蔔">
             <span class="veggie-emoji" aria-hidden="true">🥕</span><span class="veggie-name">紅蘿蔔</span>
           </button>
-          <button class="veggie" type="button" data-emoji="🥦" data-name="花椰菜" aria-pressed="false" aria-label="選擇花椰菜">
+          <button class="veggie" type="button" data-emoji="🥦" data-name="花椰菜" data-ink="#258a48" aria-pressed="false" aria-label="選擇花椰菜">
             <span class="veggie-emoji" aria-hidden="true">🥦</span><span class="veggie-name">花椰菜</span>
           </button>
-          <button class="veggie" type="button" data-emoji="🍆" data-name="茄子" aria-pressed="false" aria-label="選擇茄子">
+          <button class="veggie" type="button" data-emoji="🍆" data-name="茄子" data-ink="#9146c8" aria-pressed="false" aria-label="選擇茄子">
             <span class="veggie-emoji" aria-hidden="true">🍆</span><span class="veggie-name">茄子</span>
           </button>
-          <button class="veggie" type="button" data-emoji="🍅" data-name="番茄" aria-pressed="false" aria-label="選擇番茄">
+          <button class="veggie" type="button" data-emoji="🍅" data-name="番茄" data-ink="#ed3348" aria-pressed="false" aria-label="選擇番茄">
             <span class="veggie-emoji" aria-hidden="true">🍅</span><span class="veggie-name">番茄</span>
           </button>
-          <button class="veggie" type="button" data-emoji="🌽" data-name="玉米" aria-pressed="false" aria-label="選擇玉米">
+          <button class="veggie" type="button" data-emoji="🌽" data-name="玉米" data-ink="#f2b600" aria-pressed="false" aria-label="選擇玉米">
             <span class="veggie-emoji" aria-hidden="true">🌽</span><span class="veggie-name">玉米</span>
           </button>
-          <button class="veggie" type="button" data-emoji="🍄" data-name="蘑菇" aria-pressed="false" aria-label="選擇蘑菇">
+          <button class="veggie" type="button" data-emoji="🍄" data-name="蘑菇" data-ink="#dd5938" aria-pressed="false" aria-label="選擇蘑菇">
             <span class="veggie-emoji" aria-hidden="true">🍄</span><span class="veggie-name">蘑菇</span>
           </button>
         </div>
@@ -534,13 +535,17 @@
     const countLabel = document.getElementById("stamped-count");
     const garden = document.getElementById("garden");
     const resetButton = document.getElementById("reset-game");
-    let selectedVeggie = { emoji: "🥕", name: "紅蘿蔔" };
+    let selectedVeggie = { emoji: "🥕", name: "紅蘿蔔", ink: "#f04438" };
     let stampedCount = 0;
 
     veggieButtons.forEach((button) => {
       button.addEventListener("click", () => {
         veggieButtons.forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
-        selectedVeggie = { emoji: button.dataset.emoji, name: button.dataset.name };
+        selectedVeggie = {
+          emoji: button.dataset.emoji,
+          name: button.dataset.name,
+          ink: button.dataset.ink
+        };
       });
     });
 
@@ -573,7 +578,9 @@
     function stamp(target) {
       if (target.classList.contains("stamped")) return;
       target.classList.add("stamped");
-      target.querySelector(".target-stamp").textContent = selectedVeggie.emoji;
+      const stamp = target.querySelector(".target-stamp");
+      stamp.textContent = selectedVeggie.emoji;
+      stamp.style.setProperty("--stamp-ink", selectedVeggie.ink);
       target.setAttribute("aria-label", `${selectedVeggie.name}印章，已蓋印`);
       target.setAttribute("aria-pressed", "true");
       target.disabled = true;
@@ -599,7 +606,9 @@
         if (target.stampFrame) cancelAnimationFrame(target.stampFrame);
         target.stampFrame = null;
         target.classList.remove("stamped");
-        target.querySelector(".target-stamp").textContent = "";
+        const stamp = target.querySelector(".target-stamp");
+        stamp.textContent = "";
+        stamp.style.removeProperty("--stamp-ink");
         target.setAttribute("aria-label", `尚未蓋印的位置${targets.indexOf(target) + 1}`);
         target.removeAttribute("aria-pressed");
         target.disabled = false;

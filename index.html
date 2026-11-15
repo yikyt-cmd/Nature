@@ -1003,24 +1003,26 @@
     }
 
     async function createFabricJpg() {
-      const imagesByStage = Object.fromEntries(stages.map((stage) => [
-        stage.key,
-        stage.key === "leaf"
-          ? [...new Set(leafMarks.map((mark) => mark.image))]
-          : targets
-            .filter((target) => target.dataset.stage === stage.key && target.dataset.image)
-            .map((target) => ({
-              src: target.dataset.image,
-              size: Number(target.dataset.printSize)
-            }))
-      ]));
-      if (stages.some((stage) => imagesByStage[stage.key].length === 0) || leafMarks.length === 0) {
+      const paperBounds = garden.getBoundingClientRect();
+      const stamps = targets
+        .filter((target) => target.dataset.image)
+        .map((target) => {
+          const bounds = target.getBoundingClientRect();
+          return {
+            stage: target.dataset.stage,
+            src: target.dataset.image,
+            size: Number(target.dataset.printSize),
+            x: (bounds.left + bounds.width / 2 - paperBounds.left) / paperBounds.width,
+            y: (bounds.top + bounds.height / 2 - paperBounds.top) / paperBounds.height
+          };
+        });
+      if (stages.some((stage) => stage.key === "leaf"
+        ? leafMarks.length === 0
+        : !stamps.some((stamp) => stamp.stage === stage.key))) {
         throw new Error("缺少花、葉或小鳥印樣，請重新完成蓋印流程。");
       }
 
-      const sources = [...new Set(Object.values(imagesByStage).flat().map((entry) =>
-        typeof entry === "string" ? entry : entry.src
-      ))];
+      const sources = [...new Set([...leafMarks.map((mark) => mark.image), ...stamps.map((stamp) => stamp.src)])];
       const loadedImages = new Map(await Promise.all(sources.map(async (src) => [src, await loadArtImage(src)])));
       const tile = document.createElement("canvas");
       tile.width = 4500;
@@ -1032,52 +1034,57 @@
       tileContext.fillRect(0, 0, tile.width, tile.height);
       tileContext.imageSmoothingEnabled = true;
       tileContext.imageSmoothingQuality = "high";
-      const layoutSize = 6;
-      const layout = Array.from({ length: layoutSize }, (_, rowIndex) =>
-        Array.from({ length: layoutSize }, (_, columnIndex) =>
-          (rowIndex + columnIndex) % layoutSize === 0 ? "bird" : "flower"
-        )
-      );
-      const cellSize = tile.width / layoutSize;
+      const repeatUnitWidth = tile.width / 3;
+      const repeatScale = repeatUnitWidth / paperBounds.width;
+      const repeatUnitHeight = paperBounds.height * repeatScale;
+      const repeatOffsets = [];
+      for (let y = 0; y < tile.height; y += repeatUnitHeight) {
+        for (let x = 0; x < tile.width; x += repeatUnitWidth) {
+          repeatOffsets.push({ x, y });
+        }
+      }
 
-      leafMarks.forEach((mark) => {
-        const image = loadedImages.get(mark.image);
-        const x = mark.x * tile.width;
-        const y = mark.y * tile.height;
-        const halfSize = mark.size / 2;
+      function drawRepeatedStamp(image, x, y, size, angle, repeatOffset) {
+        const halfSize = size / 2;
+        const edgeReach = halfSize * Math.SQRT2;
         const xOffsets = [0];
         const yOffsets = [0];
-        if (x < halfSize) xOffsets.push(tile.width);
-        if (x > tile.width - halfSize) xOffsets.push(-tile.width);
-        if (y < halfSize) yOffsets.push(tile.height);
-        if (y > tile.height - halfSize) yOffsets.push(-tile.height);
+        if (x < edgeReach) xOffsets.push(repeatUnitWidth);
+        if (x > repeatUnitWidth - edgeReach) xOffsets.push(-repeatUnitWidth);
+        if (y < edgeReach) yOffsets.push(repeatUnitHeight);
+        if (y > repeatUnitHeight - edgeReach) yOffsets.push(-repeatUnitHeight);
         xOffsets.forEach((offsetX) => yOffsets.forEach((offsetY) => {
           tileContext.save();
-          tileContext.translate(x + offsetX, y + offsetY);
-          tileContext.rotate(mark.angle);
-          tileContext.drawImage(image, -halfSize, -halfSize, mark.size, mark.size);
+          tileContext.translate(x + repeatOffset.x + offsetX, y + repeatOffset.y + offsetY);
+          tileContext.rotate(angle);
+          tileContext.drawImage(image, -halfSize, -halfSize, size, size);
           tileContext.restore();
         }));
+      }
+
+      repeatOffsets.forEach((repeatOffset) => {
+        leafMarks.forEach((mark) => {
+          drawRepeatedStamp(
+            loadedImages.get(mark.image),
+            mark.x * repeatUnitWidth,
+            mark.y * repeatUnitHeight,
+            mark.size * repeatScale,
+            mark.angle,
+            repeatOffset
+          );
+        });
       });
 
-      layout.forEach((row, rowIndex) => {
-        row.forEach((kind, columnIndex) => {
-          if (!kind) return;
-          const choices = imagesByStage[kind];
-          const choice = choices[(rowIndex * layoutSize + columnIndex) % choices.length];
-          const image = loadedImages.get(choice.src);
-          const centerX = columnIndex * cellSize + cellSize / 2;
-          const centerY = rowIndex * cellSize + cellSize / 2;
-          const scale = Math.min(choice.size / image.naturalWidth, choice.size / image.naturalHeight);
-          const width = image.naturalWidth * scale;
-          const height = image.naturalHeight * scale;
-          const rotation = kind === "bird" ? 0 : (Math.random() - .5) * .16;
-
-          tileContext.save();
-          tileContext.translate(centerX, centerY);
-          tileContext.rotate(rotation);
-          tileContext.drawImage(image, -width / 2, -height / 2, width, height);
-          tileContext.restore();
+      repeatOffsets.forEach((repeatOffset) => {
+        stamps.forEach((stamp) => {
+          drawRepeatedStamp(
+            loadedImages.get(stamp.src),
+            stamp.x * repeatUnitWidth,
+            stamp.y * repeatUnitHeight,
+            stamp.size * repeatUnitWidth / tile.width,
+            -8 * Math.PI / 180,
+            repeatOffset
+          );
         });
       });
 
@@ -1101,7 +1108,7 @@
         fabricPreview.src = fabricObjectUrl;
         fabricDownload.href = fabricObjectUrl;
         fabricDownload.hidden = false;
-        fabricStatus.textContent = "重複花布 JPG 已生成（4500 × 4500）；花為 300 或 600px、小鳥 600px，包含 30 朵花與 6 隻鳥，葉片大小隨機為 100–200px，可下載保存。";
+        fabricStatus.textContent = "重複花布 JPG 已生成（4500 × 4500）；依畫紙上的圖案位置與大小等比例重複排列，可下載保存。";
       } catch (error) {
         if (generation === fabricGeneration) fabricStatus.textContent = `花布生成失敗：${error.message}`;
       } finally {

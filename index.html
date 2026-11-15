@@ -533,9 +533,6 @@
           <button class="pattern-option" type="button" data-kind="flower" data-image="crocus-1279508_1280.webp" data-name="紫花" aria-pressed="false" aria-label="選擇紫花圖樣">
             <img class="pattern-preview" src="crocus-1279508_1280.webp" alt=""><span class="pattern-name">紫花</span>
           </button>
-          <button class="pattern-option" type="button" data-kind="bird" data-image="vibrant-yellow-bird-flight-stunning-display-avian-beauty_191095-78032.avif" data-name="金鳥" aria-pressed="false" aria-label="選擇金鳥圖樣">
-            <img class="pattern-preview" src="vibrant-yellow-bird-flight-stunning-display-avian-beauty_191095-78032.avif" alt=""><span class="pattern-name">金鳥</span>
-          </button>
           <button class="pattern-option" type="button" data-kind="leaf" data-image="9ae5cb84d561e853cb062901367e86f4.png" data-name="青葉" aria-pressed="false" aria-label="選擇青葉圖樣">
             <img class="pattern-preview" src="9ae5cb84d561e853cb062901367e86f4.png" alt=""><span class="pattern-name">青葉</span>
           </button>
@@ -814,8 +811,8 @@
           const image = loadedImages.get(src);
           const centerX = columnIndex * cellSize + cellSize / 2;
           const centerY = rowIndex * cellSize + cellSize / 2;
-          const maxSize = kind === "leaf" ? 96 : 108;
-          const scale = Math.min(maxSize / image.naturalWidth, maxSize / image.naturalHeight);
+          const size = 118 + Math.random() * 24;
+          const scale = Math.min(size / image.naturalWidth, size / image.naturalHeight);
           const width = image.naturalWidth * scale;
           const height = image.naturalHeight * scale;
           const rotation = ((rowIndex * 11 + columnIndex * 7) % 17 - 8) * Math.PI / 180;

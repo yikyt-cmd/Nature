@@ -1,0 +1,20 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "nature-fabric-ai",
+  "main": "index.mjs",
+  "compatibility_date": "2026-11-15",
+  "workers_dev": true,
+  "vars": {
+    "ALLOWED_ORIGIN": "https://yikyt-cmd.github.io"
+  },
+  "ratelimits": [
+    {
+      "name": "AI_RATE_LIMIT",
+      "namespace_id": "2026111501",
+      "simple": {
+        "limit": 3,
+        "period": 60
+      }
+    }
+  ]
+}

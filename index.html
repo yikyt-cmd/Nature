@@ -484,7 +484,10 @@
     }
 
     .target.stamped:nth-of-type(even) .target-stamp { transform: scale(1) rotate(10deg); }
-    .target.stamped .stamp-image { width: 82px; height: 82px; }
+    .target.stamped .stamp-image {
+      width: var(--stamp-size, 82px);
+      height: var(--stamp-size, 82px);
+    }
 
     .complete-message {
       position: absolute;
@@ -852,17 +855,17 @@
         addLeafMark(x, y, direction);
         nextStep = leafBrushStep;
       }
-      brushDistance = distance - travelled + brushDistance;
+      brushDistance = distance - travelled;
       lastBrushPoint = current;
     }
 
-    leafCanvas.addEventListener("pointerenter", (event) => {
+    garden.addEventListener("pointerenter", (event) => {
       lastBrushPoint = null;
       brushDistance = 0;
       paintLeafAtPointer(event);
     });
-    leafCanvas.addEventListener("pointermove", paintLeafAtPointer);
-    leafCanvas.addEventListener("pointerleave", () => {
+    garden.addEventListener("pointermove", paintLeafAtPointer);
+    garden.addEventListener("pointerleave", () => {
       lastBrushPoint = null;
       brushDistance = 0;
     });
@@ -901,11 +904,14 @@
     function stamp(target) {
       const stage = stages[stageIndex];
       if (!stage || !selectedPattern || target.dataset.stage !== stage.key || target.classList.contains("stamped")) return;
+      const stampIndex = targets.filter((item) =>
+        item.dataset.stage === stage.key && item.classList.contains("stamped")
+      ).length;
       target.classList.add("stamped");
       const stampImage = target.querySelector(".stamp-image");
       stampImage.src = selectedPattern.image;
       stampImage.alt = `${selectedPattern.name}圖樣`;
-      const printSize = stage.key === "bird" ? 1500 : Math.random() < .5 ? 300 : 600;
+      const printSize = stage.key === "bird" ? 1500 : stampIndex % 2 === 0 ? 300 : 600;
       target.dataset.printSize = String(printSize);
       target.style.setProperty("--stamp-size", `${getDisplayStampSize(printSize)}px`);
       target.dataset.image = selectedPattern.image;
@@ -981,16 +987,20 @@
         stage.key,
         stage.key === "leaf"
           ? [...new Set(leafMarks.map((mark) => mark.image))]
-          : [...new Set(targets
-          .filter((target) => target.dataset.stage === stage.key)
-          .map((target) => target.dataset.image)
-          .filter(Boolean))]
+          : targets
+            .filter((target) => target.dataset.stage === stage.key && target.dataset.image)
+            .map((target) => ({
+              src: target.dataset.image,
+              size: Number(target.dataset.printSize)
+            }))
       ]));
       if (stages.some((stage) => imagesByStage[stage.key].length === 0) || leafMarks.length === 0) {
         throw new Error("缺少花、葉或小鳥印樣，請重新完成蓋印流程。");
       }
 
-      const sources = [...new Set(Object.values(imagesByStage).flat())];
+      const sources = [...new Set(Object.values(imagesByStage).flat().map((entry) =>
+        typeof entry === "string" ? entry : entry.src
+      ))];
       const loadedImages = new Map(await Promise.all(sources.map(async (src) => [src, await loadArtImage(src)])));
       const tile = document.createElement("canvas");
       tile.width = 4500;
@@ -1007,29 +1017,7 @@
         ["flower", "bird", "flower"],
         ["flower", null, "bird"]
       ];
-      const cellSize = tile.width / 4;
-
-      layout.forEach((row, rowIndex) => {
-        row.forEach((kind, columnIndex) => {
-          if (!kind) return;
-          const choices = imagesByStage[kind];
-          const src = choices[(rowIndex + columnIndex) % choices.length];
-          const image = loadedImages.get(src);
-          const centerX = columnIndex * cellSize + cellSize / 2;
-          const centerY = rowIndex * cellSize + cellSize / 2;
-          const size = kind === "bird" ? 1500 : Math.random() < .5 ? 300 : 600;
-          const scale = Math.min(size / image.naturalWidth, size / image.naturalHeight);
-          const width = image.naturalWidth * scale;
-          const height = image.naturalHeight * scale;
-          const rotation = kind === "bird" ? 0 : (Math.random() - .5) * .16;
-
-          tileContext.save();
-          tileContext.translate(centerX, centerY);
-          tileContext.rotate(rotation);
-          tileContext.drawImage(image, -width / 2, -height / 2, width, height);
-          tileContext.restore();
-        });
-      });
+      const cellSize = tile.width / 3;
 
       leafMarks.forEach((mark) => {
         const image = loadedImages.get(mark.image);
@@ -1049,6 +1037,27 @@
           tileContext.drawImage(image, -halfSize, -halfSize, leafBrushSize, leafBrushSize);
           tileContext.restore();
         }));
+      });
+
+      layout.forEach((row, rowIndex) => {
+        row.forEach((kind, columnIndex) => {
+          if (!kind) return;
+          const choices = imagesByStage[kind];
+          const choice = choices[(rowIndex + columnIndex) % choices.length];
+          const image = loadedImages.get(choice.src);
+          const centerX = columnIndex * cellSize + cellSize / 2;
+          const centerY = rowIndex * cellSize + cellSize / 2;
+          const scale = Math.min(choice.size / image.naturalWidth, choice.size / image.naturalHeight);
+          const width = image.naturalWidth * scale;
+          const height = image.naturalHeight * scale;
+          const rotation = kind === "bird" ? 0 : (Math.random() - .5) * .16;
+
+          tileContext.save();
+          tileContext.translate(centerX, centerY);
+          tileContext.rotate(rotation);
+          tileContext.drawImage(image, -width / 2, -height / 2, width, height);
+          tileContext.restore();
+        });
       });
 
       return new Promise((resolve, reject) => {

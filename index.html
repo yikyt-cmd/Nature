@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f8f5e9">
-  <title>花鳥</title>
+  <title>花蝶蓋印</title>
   <style>
     :root {
       color-scheme: light;
@@ -69,6 +69,19 @@
       backdrop-filter: blur(8px);
     }
 
+    .sidebar.collapsed {
+      width: auto;
+      max-width: calc(100% - 24px);
+      gap: 0;
+      padding: 8px;
+      overflow: visible;
+    }
+
+    .sidebar.collapsed .pattern-list,
+    .sidebar.collapsed .instruction,
+    .sidebar.collapsed .game-status,
+    .sidebar.collapsed .fabric-output { display: none; }
+
     .section-label {
       margin: 0;
       color: #405944;
@@ -78,6 +91,7 @@
     }
 
     .control-head { display: flex; align-items: center; gap: 10px; }
+    .control-toggle { white-space: nowrap; }
 
     .pattern-list {
       display: grid;
@@ -208,13 +222,54 @@
       text-align: center;
     }
 
+    .fabric-preview-dialog {
+      width: min(94vw, 1100px);
+      max-width: none;
+      height: min(92dvh, 1000px);
+      max-height: none;
+      padding: 14px;
+      border: 1px solid rgba(115, 93, 72, .24);
+      border-radius: 16px;
+      color: #293d31;
+      background: #fff;
+      box-shadow: 0 16px 70px rgba(34, 25, 18, .35);
+    }
+
+    .fabric-preview-dialog::backdrop { background: rgba(31, 27, 24, .72); }
+
+    .fabric-preview-content {
+      display: grid;
+      width: 100%;
+      height: 100%;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      gap: 10px;
+    }
+
+    .fabric-preview-header, .fabric-preview-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .fabric-preview-header h2 {
+      margin: 0;
+      font-size: 16px;
+    }
+
     .fabric-preview {
       display: block;
       width: 100%;
-      max-height: min(30vh, 190px);
+      height: 100%;
+      min-height: 0;
       border: 1px solid #e8ded1;
       object-fit: contain;
       background: #a71922;
+    }
+
+    .fabric-preview-actions .download {
+      width: fit-content;
+      min-width: 120px;
     }
 
     .fabric-status {
@@ -467,6 +522,8 @@
 
     @media (max-width: 760px) {
       .sidebar { top: 8px; left: 8px; width: min(360px, calc(100% - 16px)); max-height: calc(100% - 16px); padding: 9px; gap: 6px; }
+      .sidebar.collapsed { max-width: calc(100% - 16px); padding: 7px; }
+      .control-head { gap: 7px; }
       .pattern-option { min-height: 56px; gap: 3px; }
       .pattern-preview { width: 32px; height: 32px; }
       .target { width: 84px; height: 84px; }
@@ -479,6 +536,7 @@
 
     @media (max-width: 430px) {
       .sidebar { width: min(340px, calc(100% - 16px)); }
+      .sidebar.collapsed { width: auto; }
       .pattern-list { gap: 4px; }
       .pattern-option { min-height: 50px; padding: 4px 2px; }
       .pattern-preview { width: 28px; height: 28px; }
@@ -504,26 +562,25 @@
 </head>
 <body>
   <main class="page">
-    <section class="game-card" aria-label="花鳥蓋印">
+    <section class="game-card" aria-label="花蝶蓋印">
       <div class="garden" id="garden" aria-label="畫紙">
-        <aside class="sidebar" aria-label="操作">
+        <aside class="sidebar collapsed" aria-label="操作">
           <div class="control-head">
             <h2 class="section-label" id="stage-heading">葉</h2>
             <div class="progress-card" aria-live="polite">
               <span class="progress-label" id="progress-label">進度</span>
               <span class="progress-count"><span id="stamped-count">0</span><small id="stage-total"> 片</small></span>
             </div>
+            <button class="finish-leaves" id="finish-leaves" type="button" disabled hidden>完成</button>
             <button class="reset" id="reset-game" type="button">重來</button>
+            <button class="reset control-toggle" id="toggle-controls" type="button" aria-controls="game-controls" aria-expanded="false">操作</button>
           </div>
-          <div class="pattern-list" role="group" aria-label="選圖">
+          <div class="pattern-list" id="game-controls" role="group" aria-label="選圖">
             <button class="pattern-option" type="button" data-kind="flower" data-image="crocus-1279508_1280.webp" data-name="紫花" aria-pressed="false" aria-label="紫花">
               <img class="pattern-preview" src="crocus-1279508_1280.webp" alt=""><span class="pattern-name">紫花</span>
             </button>
             <button class="pattern-option" type="button" data-kind="leaf" data-image="9ae5cb84d561e853cb062901367e86f4.png" data-name="青葉" aria-pressed="false" aria-label="青葉">
               <img class="pattern-preview" src="9ae5cb84d561e853cb062901367e86f4.png" alt=""><span class="pattern-name">青葉</span>
-            </button>
-            <button class="pattern-option" type="button" data-kind="bird" data-image="pngtree-small-cute-bird-png-image_9959508.png" data-name="雀鳥" aria-pressed="false" aria-label="雀鳥">
-              <img class="pattern-preview" src="pngtree-small-cute-bird-png-image_9959508.png" alt=""><span class="pattern-name">雀鳥</span>
             </button>
             <button class="pattern-option" type="button" data-kind="flower" data-image="pngtree-mugunghwa-pink-flower-of-korea-png-png-image_11494956.png" data-name="木槿" aria-pressed="false" aria-label="木槿">
               <img class="pattern-preview" src="pngtree-mugunghwa-pink-flower-of-korea-png-png-image_11494956.png" alt=""><span class="pattern-name">木槿</span>
@@ -531,11 +588,9 @@
           </div>
           <p class="instruction" id="stage-instruction">選葉，拖畫；完成後按「完成」。</p>
           <p class="game-status" id="game-status" role="status">選一款葉片。</p>
-          <button class="finish-leaves" id="finish-leaves" type="button" disabled hidden>完成</button>
           <section class="fabric-output" id="fabric-output" aria-label="花布" hidden>
-            <img class="fabric-preview" id="fabric-preview" alt="花布預覽">
             <p class="fabric-status" id="fabric-status" role="status">製作中…</p>
-            <a class="download" id="fabric-download" download="花鳥重複花布.jpg" hidden>下載 JPG</a>
+            <button class="reset" id="show-fabric-preview" type="button" hidden>預覽花布</button>
             <details class="fabric-ai-settings">
               <summary>AI 布底</summary>
               <label for="fabric-ai-endpoint">Worker 網址</label>
@@ -546,6 +601,19 @@
             <button class="reset" id="generate-fabric" type="button">再生成</button>
           </section>
         </aside>
+        <dialog class="fabric-preview-dialog" id="fabric-preview-dialog" aria-labelledby="fabric-preview-title">
+          <div class="fabric-preview-content">
+            <header class="fabric-preview-header">
+              <h2 id="fabric-preview-title">花布預覽</h2>
+              <button class="reset" id="close-fabric-preview" type="button">關閉</button>
+            </header>
+            <img class="fabric-preview" id="fabric-preview" alt="重複花布預覽">
+            <div class="fabric-preview-actions">
+              <span class="fabric-status" id="preview-fabric-status"></span>
+              <a class="download" id="fabric-download" download="花鳥蝴蝶重複花布.jpg" hidden>下載 JPG</a>
+            </div>
+          </div>
+        </dialog>
         <canvas class="leaf-canvas" id="leaf-canvas" aria-label="自由繪製葉片的畫紙區" hidden></canvas>
         <span class="leaf-guide" style="left:19%;top:40%" aria-hidden="true"></span>
         <span class="leaf-guide" style="left:42%;top:42%" aria-hidden="true"></span>
@@ -567,10 +635,10 @@
         <button class="target" type="button" data-stage="flower" style="left:30%;top:64%" aria-label="花五">
           <span class="target-glow" aria-hidden="true"></span><span class="target-progress" aria-hidden="true"></span><span class="target-stamp" aria-hidden="true"><img class="stamp-image" alt=""></span>
         </button>
-        <button class="target" type="button" data-stage="bird" style="left:32%;top:48%" aria-label="鳥一">
+        <button class="target" type="button" data-stage="butterfly" style="left:32%;top:48%" aria-label="蝴蝶一">
           <span class="target-glow" aria-hidden="true"></span><span class="target-progress" aria-hidden="true"></span><span class="target-stamp" aria-hidden="true"><img class="stamp-image" alt=""></span>
         </button>
-        <button class="target" type="button" data-stage="bird" style="left:74%;top:63%" aria-label="鳥二">
+        <button class="target" type="button" data-stage="butterfly" style="left:74%;top:63%" aria-label="蝴蝶二">
           <span class="target-glow" aria-hidden="true"></span><span class="target-progress" aria-hidden="true"></span><span class="target-stamp" aria-hidden="true"><img class="stamp-image" alt=""></span>
         </button>
         <div class="complete-message" role="status">完成</div>
@@ -589,18 +657,29 @@
     const progressLabel = document.getElementById("progress-label");
     const gameStatus = document.getElementById("game-status");
     const garden = document.getElementById("garden");
+    const sidebar = document.querySelector(".sidebar");
+    const toggleControlsButton = document.getElementById("toggle-controls");
     const resetButton = document.getElementById("reset-game");
     const leafCanvas = document.getElementById("leaf-canvas");
     const leafBrushContext = leafCanvas.getContext("2d");
     const finishLeavesButton = document.getElementById("finish-leaves");
     const fabricOutput = document.getElementById("fabric-output");
     const fabricPreview = document.getElementById("fabric-preview");
+    const fabricPreviewDialog = document.getElementById("fabric-preview-dialog");
+    const showFabricPreviewButton = document.getElementById("show-fabric-preview");
+    const closeFabricPreviewButton = document.getElementById("close-fabric-preview");
     const fabricStatus = document.getElementById("fabric-status");
+    const previewFabricStatus = document.getElementById("preview-fabric-status");
     const fabricDownload = document.getElementById("fabric-download");
     const generateFabricButton = document.getElementById("generate-fabric");
     const fabricAiEndpointInput = document.getElementById("fabric-ai-endpoint");
     const saveFabricAiEndpointButton = document.getElementById("save-fabric-ai-endpoint");
     const fabricAiEndpointStorageKey = "nature-fabric-ai-endpoint";
+    const butterflyPatterns = [
+      { image: "B1.png", name: "蝴蝶" },
+      { image: "B2.png", name: "蝴蝶" },
+      { image: "b3.png", name: "蝴蝶" }
+    ];
     let fabricAiEndpoint = "";
     try {
       fabricAiEndpoint = window.localStorage.getItem(fabricAiEndpointStorageKey) || "";
@@ -611,11 +690,13 @@
     const stages = [
       { key: "leaf", kind: "leaf", name: "葉", heading: "葉", count: null },
       { key: "flower", kind: "flower", name: "花", heading: "花", count: 5 },
-      { key: "bird", kind: "bird", name: "鳥", heading: "鳥", count: 2 }
+      { key: "butterfly", kind: "butterfly", name: "蝴蝶", heading: "蝴蝶", count: 2 }
     ];
     let stageIndex = 0;
     let selectedPattern = null;
     let patternLocked = false;
+    let butterflyAssetsReady = false;
+    let butterflyLoadError = null;
     let leafMarks = [];
     let lastBrushPoint = null;
     let brushDistance = 0;
@@ -629,11 +710,29 @@
     let fabricObjectUrl = null;
     let fabricGeneration = 0;
 
+    function setControlsCollapsed(collapsed) {
+      sidebar.classList.toggle("collapsed", collapsed);
+      toggleControlsButton.setAttribute("aria-expanded", String(!collapsed));
+      toggleControlsButton.textContent = collapsed ? "操作" : "收起";
+    }
+
+    function randomButterflyPattern() {
+      return butterflyPatterns[Math.floor(Math.random() * butterflyPatterns.length)];
+    }
+
+    function randomButterflyPrintSize() {
+      return 400 + Math.floor(Math.random() * 301);
+    }
+
+    toggleControlsButton.addEventListener("click", () => {
+      setControlsCollapsed(!sidebar.classList.contains("collapsed"));
+    });
+
     function updateStageView() {
       const stage = stages[stageIndex];
       const complete = !stage;
 
-      patternList.hidden = complete;
+      patternList.hidden = complete || stage?.kind === "butterfly";
       fabricOutput.hidden = !complete;
       finishLeavesButton.hidden = stage?.key !== "leaf";
       finishLeavesButton.disabled = stage?.key !== "leaf" || leafMarks.length === 0;
@@ -652,6 +751,7 @@
       });
 
       if (complete) {
+        setControlsCollapsed(false);
         stageHeading.textContent = "完成";
         progressLabel.textContent = "進度";
         countLabel.textContent = String(7 + leafMarks.length);
@@ -671,6 +771,10 @@
         stageInstruction.textContent = "選葉，拖畫；完成後按「完成」。";
         return;
       }
+      if (stage.key === "butterfly") {
+        stageInstruction.textContent = "蝴蝶隨機，停在紅圈 1 秒。";
+        return;
+      }
       stageInstruction.innerHTML = selectedPattern
         ? `停在紅圈 <strong>1 秒</strong>。`
         : "選圖，停在紅圈 1 秒。";
@@ -684,6 +788,7 @@
           name: button.dataset.name
         };
         updateStageView();
+        setControlsCollapsed(true);
         const chosenPattern = selectedPattern;
         gameStatus.textContent = "載入中…";
         try {
@@ -828,7 +933,13 @@
       const stage = stages[stageIndex];
       if (target.hidden || target.disabled || target.classList.contains("stamped") || target.stampFrame) return;
       if (!stage || target.dataset.stage !== stage.key) return;
-      if (!selectedPattern) {
+      if (stage.key === "butterfly" && !butterflyAssetsReady) {
+        gameStatus.textContent = butterflyLoadError
+          ? `蝴蝶載入失敗：${butterflyLoadError.message}`
+          : "蝴蝶載入中…";
+        return;
+      }
+      if (stage.key !== "butterfly" && !selectedPattern) {
         gameStatus.textContent = "先選圖。";
         return;
       }
@@ -850,19 +961,23 @@
 
     function stamp(target) {
       const stage = stages[stageIndex];
-      if (!stage || !selectedPattern || target.dataset.stage !== stage.key || target.classList.contains("stamped")) return;
+      if (!stage || target.dataset.stage !== stage.key || target.classList.contains("stamped")) return;
+      const stampPattern = stage.key === "butterfly" ? randomButterflyPattern() : selectedPattern;
+      if (!stampPattern) return;
       const stampIndex = targets.filter((item) =>
         item.dataset.stage === stage.key && item.classList.contains("stamped")
       ).length;
       target.classList.add("stamped");
       const stampImage = target.querySelector(".stamp-image");
-      stampImage.src = selectedPattern.image;
-      stampImage.alt = `${selectedPattern.name}圖樣`;
-      const printSize = stage.key === "bird" ? 600 : stampIndex % 2 === 0 ? 300 : 600;
+      stampImage.src = stampPattern.image;
+      stampImage.alt = `${stampPattern.name}圖樣`;
+      const printSize = stage.key === "butterfly"
+        ? randomButterflyPrintSize()
+        : stampIndex % 2 === 0 ? 300 : 600;
       target.dataset.printSize = String(printSize);
       target.style.setProperty("--stamp-size", `${getDisplayStampSize(printSize)}px`);
-      target.dataset.image = selectedPattern.image;
-      target.setAttribute("aria-label", `${stage.name}：${selectedPattern.name}圖樣，已蓋印`);
+      target.dataset.image = stampPattern.image;
+      target.setAttribute("aria-label", `${stage.name}：${stampPattern.name}圖樣，已蓋印`);
       target.setAttribute("aria-pressed", "true");
       target.disabled = true;
       target.style.removeProperty("--progress");
@@ -912,6 +1027,7 @@
       lastBrushSize = 0;
       nextLeafBrushSize = null;
       updateStageView();
+      setControlsCollapsed(false);
       gameStatus.textContent = `完成 ${leafMarks.length} 片。`;
     });
 
@@ -930,6 +1046,20 @@
       imagePromise.catch(() => artImageCache.delete(src));
       return imagePromise;
     }
+
+    Promise.all(butterflyPatterns.map((pattern) => loadArtImage(pattern.image)))
+      .then(() => {
+        butterflyAssetsReady = true;
+      })
+      .catch((error) => {
+        butterflyLoadError = error;
+        gameStatus.textContent = `蝴蝶載入失敗：${error.message}`;
+      });
+
+    showFabricPreviewButton.addEventListener("click", () => {
+      if (!fabricPreviewDialog.open) fabricPreviewDialog.showModal();
+    });
+    closeFabricPreviewButton.addEventListener("click", () => fabricPreviewDialog.close());
 
     saveFabricAiEndpointButton.addEventListener("click", () => {
       const value = fabricAiEndpointInput.value.trim();
@@ -1041,7 +1171,7 @@
       if (stages.some((stage) => stage.key === "leaf"
         ? leafMarks.length === 0
         : !stamps.some((stamp) => stamp.stage === stage.key))) {
-        throw new Error("缺少花、葉或小鳥印樣，請重新完成蓋印流程。");
+        throw new Error("缺少花、葉或蝴蝶印樣，請重新完成蓋印流程。");
       }
 
       const sources = [...new Set([...fabricLeafMarks.map((mark) => mark.image), ...stamps.map((stamp) => stamp.src)])];
@@ -1164,7 +1294,10 @@
         fabricPreview.src = fabricObjectUrl;
         fabricDownload.href = fabricObjectUrl;
         fabricDownload.hidden = false;
+        showFabricPreviewButton.hidden = false;
         fabricStatus.textContent = backgroundImage ? "完成（AI 布底）。" : "完成。";
+        previewFabricStatus.textContent = fabricStatus.textContent;
+        if (!fabricPreviewDialog.open) fabricPreviewDialog.showModal();
       } catch (error) {
         if (generation === fabricGeneration) fabricStatus.textContent = `花布生成失敗：${error.message}`;
       } finally {
@@ -1200,16 +1333,20 @@
       fabricPreview.removeAttribute("src");
       fabricDownload.removeAttribute("href");
       fabricDownload.hidden = true;
+      showFabricPreviewButton.hidden = true;
+      if (fabricPreviewDialog.open) fabricPreviewDialog.close();
       leafMarks = [];
       lastBrushPoint = null;
       brushDistance = 0;
       lastBrushSize = 0;
       nextLeafBrushSize = null;
       resizeLeafCanvas();
-      fabricStatus.textContent = "製作中…";
+      fabricStatus.textContent = "尚未生成。";
+      previewFabricStatus.textContent = "";
       gameStatus.textContent = "選一款葉片。";
       garden.classList.remove("complete");
       updateStageView();
+      setControlsCollapsed(true);
     });
 
     updateStageView();

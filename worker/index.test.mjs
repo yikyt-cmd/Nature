@@ -60,6 +60,9 @@ test("allows the Pages origin and returns a generated background", async (t) => 
   assert.equal(generationRequest.model, "gpt-image-2.6-flare");
   assert.match(generationRequest.prompt, /cinnabar-red/i);
   assert.match(generationRequest.prompt, /seamless.*repeat/i);
+  assert.match(generationRequest.prompt, /four-way repeat/i);
+  assert.match(generationRequest.prompt, /two-way continuous/i);
+  assert.match(generationRequest.prompt, /larger medallions.*smaller/i);
   assert.equal(upstreamRequest.options.headers.Authorization, "Bearer test-key");
 });
 

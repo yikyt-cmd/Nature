@@ -1285,6 +1285,37 @@
         tileContext.fillStyle = textilePattern;
         tileContext.fillRect(0, 0, tile.width, tile.height);
       }
+      const borderInset = 52;
+      tileContext.save();
+      tileContext.strokeStyle = "rgba(241, 205, 126, .62)";
+      tileContext.fillStyle = "rgba(241, 205, 126, .72)";
+      tileContext.lineWidth = 7;
+      tileContext.strokeRect(borderInset, borderInset, tile.width - borderInset * 2, tile.height - borderInset * 2);
+      tileContext.lineWidth = 3;
+      tileContext.strokeRect(borderInset + 18, borderInset + 18, tile.width - (borderInset + 18) * 2, tile.height - (borderInset + 18) * 2);
+
+      function drawBorderDiamond(x, y) {
+        tileContext.beginPath();
+        tileContext.moveTo(x, y - 16);
+        tileContext.lineTo(x + 16, y);
+        tileContext.lineTo(x, y + 16);
+        tileContext.lineTo(x - 16, y);
+        tileContext.closePath();
+        tileContext.stroke();
+        tileContext.beginPath();
+        tileContext.arc(x, y, 4, 0, Math.PI * 2);
+        tileContext.fill();
+      }
+
+      for (let x = borderInset + 58; x < tile.width - borderInset - 40; x += 180) {
+        drawBorderDiamond(x, borderInset + 11);
+        drawBorderDiamond(x, tile.height - borderInset - 11);
+      }
+      for (let y = borderInset + 58; y < tile.height - borderInset - 40; y += 180) {
+        drawBorderDiamond(borderInset + 11, y);
+        drawBorderDiamond(tile.width - borderInset - 11, y);
+      }
+      tileContext.restore();
       tileContext.imageSmoothingEnabled = true;
       tileContext.imageSmoothingQuality = "high";
       const repeatUnitWidth = tile.width / 3;

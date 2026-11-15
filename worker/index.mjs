@@ -1,8 +1,9 @@
 const OPENAI_IMAGE_ENDPOINT = "https://api.openai.com/v1/images/generations";
 const BACKGROUND_PROMPT = [
-  "Create a rich cinnabar-red woven silk background inspired by traditional Chinese printed cotton and brocade.",
-  "Cover it with a seamless, evenly spaced repeat of small classic Chinese key-fret geometry, auspicious cloud curls, and restrained antique-gold medallions.",
-  "Use a fine visible textile weave and balanced, orderly pattern spacing; keep the motifs decorative and low-contrast so foreground artwork remains clear.",
+  "Create a rich cinnabar-red woven textile background inspired by traditional Chinese printed cotton and brocade.",
+  "Make the main field a true seamless four-way repeat tile that joins cleanly on all four sides, with an orderly repeat of classic Chinese key-fret geometry, auspicious cloud curls, and restrained antique-gold medallions.",
+  "Add narrow two-way continuous ornamental border bands along the top, bottom, left, and right edges, with aligned, clean corners.",
+  "Use a fine visible textile weave and clear visual hierarchy: a few larger medallions with smaller, quieter filler motifs, balanced spacing, and no crowded areas.",
   "Do not draw flowers, leaves, birds, animals, objects, text, letters, frames, or watermarks.",
   "Show a flat fabric surface from directly above with even lighting and no gradients or blank ivory areas."
 ].join(" ");

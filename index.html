@@ -287,8 +287,8 @@
     .target {
       position: absolute;
       display: grid;
-      width: 72px;
-      height: 72px;
+      width: 104px;
+      height: 104px;
       padding: 0;
       place-items: center;
       border: 0;
@@ -328,7 +328,7 @@
       z-index: 1;
       inset: 0;
       border-radius: 50%;
-      background: conic-gradient(var(--vermilion) calc(var(--progress, 0) * 1%), transparent 0);
+      background: conic-gradient(var(--gold) calc(var(--progress, 0) * 1%), transparent 0);
       opacity: .9;
       -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
       mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
@@ -339,13 +339,12 @@
       position: relative;
       z-index: 2;
       display: grid;
-      width: 62px;
-      height: 62px;
+      width: 92px;
+      height: 92px;
       place-items: center;
-      border: 2px solid rgba(169, 54, 43, .72);
-      border-radius: 9px;
-      background: #fffdf8;
-      box-shadow: inset 0 0 0 2px #fffdf8, inset 0 0 0 3px rgba(189, 150, 82, .62);
+      border: 0;
+      background: transparent;
+      box-shadow: none;
       opacity: .38;
       transform: scale(.7);
       transition: opacity .25s ease, transform .25s ease;
@@ -354,9 +353,8 @@
 
     .stamp-image {
       display: block;
-      width: 48px;
-      height: 48px;
-      border-radius: 4px;
+      width: 82px;
+      height: 82px;
       object-fit: contain;
     }
 
@@ -378,13 +376,9 @@
     .target.stamped .target-progress { display: none; }
 
     .target.stamped .target-stamp {
-      border: 2px solid var(--vermilion);
-      background: #fffdf8;
-      box-shadow:
-        inset 0 0 0 2px #fffdf8,
-        inset 0 0 0 3px var(--gold),
-        0 0 0 2px rgba(169, 54, 43, .22),
-        0 3px 8px rgba(62, 58, 42, .14);
+      border: 0;
+      background: transparent;
+      box-shadow: none;
       opacity: 1;
       filter: saturate(1.2) contrast(1.04);
       transform: scale(1) rotate(-12deg);
@@ -392,7 +386,7 @@
     }
 
     .target.stamped:nth-of-type(even) .target-stamp { transform: scale(1) rotate(10deg); }
-    .target.stamped .stamp-image { width: 48px; height: 48px; }
+    .target.stamped .stamp-image { width: 82px; height: 82px; }
 
     .complete-message {
       position: absolute;
@@ -444,9 +438,9 @@
       .progress-card { padding-top: 10px; }
       .reset { margin-top: 5px; }
       .garden { min-height: max(480px, min(72vh, 680px)); }
-      .target { width: 64px; height: 64px; }
-      .target-stamp { width: 49px; height: 49px; }
-      .stamp-image, .target.stamped .stamp-image { width: 37px; height: 37px; }
+      .target { width: 84px; height: 84px; }
+      .target-stamp { width: 74px; height: 74px; }
+      .stamp-image, .target.stamped .stamp-image { width: 64px; height: 64px; }
     }
 
     @media (max-width: 430px) {
@@ -458,9 +452,9 @@
       .pattern-name { font-size: 9px; }
       .garden { min-height: max(420px, min(72vh, 620px)); }
       .garden-note { top: 15px; left: 16px; }
-      .target { width: 58px; height: 58px; }
-      .target-stamp { width: 44px; height: 44px; }
-      .stamp-image, .target.stamped .stamp-image { width: 32px; height: 32px; }
+      .target { width: 74px; height: 74px; }
+      .target-stamp { width: 66px; height: 66px; }
+      .stamp-image, .target.stamped .stamp-image { width: 58px; height: 58px; }
     }
 
     @media (prefers-reduced-motion: reduce) {

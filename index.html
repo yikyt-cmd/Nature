@@ -721,7 +721,75 @@
     }
 
     function randomButterflyPrintSize() {
-      return 400 + Math.floor(Math.random() * 301);
+      return 700 + Math.floor(Math.random() * 501);
+    }
+
+    function chooseRandomHintPosition(bounds, placed, minimumDistance, verticalMargin, blockedBounds, radius) {
+      let candidate;
+      let fallback;
+      for (let attempt = 0; attempt < 120; attempt += 1) {
+        candidate = {
+          x: .15 + Math.random() * .7,
+          y: verticalMargin + Math.random() * (1 - 2 * verticalMargin)
+        };
+        const x = candidate.x * bounds.width;
+        const y = candidate.y * bounds.height;
+        const overlapsControls = blockedBounds
+          && x + radius >= blockedBounds.left
+          && x - radius <= blockedBounds.right
+          && y + radius >= blockedBounds.top
+          && y - radius <= blockedBounds.bottom;
+        if (overlapsControls) continue;
+        fallback ||= candidate;
+        if (placed.every((point) => Math.hypot(
+          (candidate.x - point.x) * bounds.width,
+          (candidate.y - point.y) * bounds.height
+        ) >= minimumDistance)) return candidate;
+      }
+      return fallback || candidate;
+    }
+
+    function randomizeHintPositions() {
+      const bounds = garden.getBoundingClientRect();
+      const verticalMargin = Math.min(.43, Math.max(.17, .15 * bounds.width / bounds.height));
+      const minimumDistance = Math.min(bounds.width, bounds.height) * .18;
+      const sidebarBounds = sidebar.getBoundingClientRect();
+      const blockedBounds = {
+        left: sidebarBounds.left - bounds.left,
+        right: sidebarBounds.right - bounds.left,
+        top: sidebarBounds.top - bounds.top,
+        bottom: sidebarBounds.bottom - bounds.top
+      };
+      const stampRadius = bounds.width * 1200 / 9000 + 8;
+      const positions = [];
+      targets.forEach((target) => {
+        const point = chooseRandomHintPosition(
+          bounds,
+          positions,
+          minimumDistance,
+          verticalMargin,
+          blockedBounds,
+          stampRadius
+        );
+        positions.push(point);
+        target.style.left = `${point.x * 100}%`;
+        target.style.top = `${point.y * 100}%`;
+      });
+
+      const guidePositions = [];
+      document.querySelectorAll(".leaf-guide").forEach((guide) => {
+        const point = chooseRandomHintPosition(
+          bounds,
+          guidePositions,
+          minimumDistance * .8,
+          verticalMargin,
+          blockedBounds,
+          16
+        );
+        guidePositions.push(point);
+        guide.style.left = `${point.x * 100}%`;
+        guide.style.top = `${point.y * 100}%`;
+      });
     }
 
     toggleControlsButton.addEventListener("click", () => {
@@ -1345,10 +1413,12 @@
       previewFabricStatus.textContent = "";
       gameStatus.textContent = "選一款葉片。";
       garden.classList.remove("complete");
-      updateStageView();
       setControlsCollapsed(true);
+      randomizeHintPositions();
+      updateStageView();
     });
 
+    randomizeHintPositions();
     updateStageView();
   </script>
 </body>

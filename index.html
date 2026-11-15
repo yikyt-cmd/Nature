@@ -691,9 +691,11 @@
     let leafMarks = [];
     let lastBrushPoint = null;
     let brushDistance = 0;
-    const leafBrushSize = 48;
+    let lastBrushSize = 0;
+    let nextLeafBrushSize = null;
+    const minLeafBrushSize = 100;
+    const maxLeafBrushSize = 200;
     const leafBrushGap = 5;
-    const leafBrushStep = leafBrushSize + leafBrushGap;
     const artImageCache = new Map();
     const loadedArtImages = new Map();
     let fabricObjectUrl = null;
@@ -738,7 +740,7 @@
       countLabel.textContent = String(stage.key === "leaf" ? leafMarks.length : stampedInStage);
       stageTotal.textContent = stage.count === null ? " 片已畫" : ` / ${stage.count}`;
       if (stage.key === "leaf") {
-        stageInstruction.innerHTML = `選擇葉片後，在白紙上移動滑鼠自由描畫；葉片筆刷為 ${leafBrushSize}px，葉與葉間距 <strong>${leafBrushGap}px</strong>。完成後按 OK 前往下一步。`;
+        stageInstruction.innerHTML = `選擇葉片後，在白紙上移動滑鼠自由描畫；葉片大小隨機為 ${minLeafBrushSize}–${maxLeafBrushSize}px，葉與葉間距 <strong>${leafBrushGap}px</strong>。完成後按 OK 前往下一步。`;
         return;
       }
       stageInstruction.innerHTML = selectedPattern
@@ -799,20 +801,26 @@
       const image = loadedArtImages.get(mark.image);
       if (!image || !leafBrushContext) return;
       const bounds = garden.getBoundingClientRect();
+      const halfSize = mark.size / 2;
       leafBrushContext.save();
       leafBrushContext.translate(mark.x * bounds.width, mark.y * bounds.height);
       leafBrushContext.rotate(mark.angle);
-      leafBrushContext.drawImage(image, -leafBrushSize / 2, -leafBrushSize / 2, leafBrushSize, leafBrushSize);
+      leafBrushContext.drawImage(image, -halfSize, -halfSize, mark.size, mark.size);
       leafBrushContext.restore();
     }
 
-    function addLeafMark(x, y, angle) {
-      if (!selectedPattern || !loadedArtImages.has(selectedPattern.image)) return;
+    function randomLeafBrushSize() {
+      return minLeafBrushSize + Math.floor(Math.random() * (maxLeafBrushSize - minLeafBrushSize + 1));
+    }
+
+    function addLeafMark(x, y, angle, size) {
+      if (!selectedPattern || !loadedArtImages.has(selectedPattern.image)) return null;
       const bounds = garden.getBoundingClientRect();
       const mark = {
         x: x / bounds.width,
         y: y / bounds.height,
         angle,
+        size,
         image: selectedPattern.image
       };
       leafMarks.push(mark);
@@ -823,18 +831,22 @@
       if (leafMarks.length === 1 || leafMarks.length % 20 === 0) {
         gameStatus.textContent = `葉片筆刷已畫 ${leafMarks.length} 片；完成後按 OK 前往花朵。`;
       }
+      return mark;
     }
 
     function paintLeafAtPointer(event) {
       if (stages[stageIndex]?.key !== "leaf" || !selectedPattern || !loadedArtImages.has(selectedPattern.image)) return;
       const bounds = garden.getBoundingClientRect();
+      const edgeMargin = maxLeafBrushSize / 2;
       const current = {
-        x: Math.max(leafBrushSize / 2, Math.min(event.clientX - bounds.left, bounds.width - leafBrushSize / 2)),
-        y: Math.max(leafBrushSize / 2, Math.min(event.clientY - bounds.top, bounds.height - leafBrushSize / 2))
+        x: Math.max(edgeMargin, Math.min(event.clientX - bounds.left, bounds.width - edgeMargin)),
+        y: Math.max(edgeMargin, Math.min(event.clientY - bounds.top, bounds.height - edgeMargin))
       };
       if (!lastBrushPoint) {
-        addLeafMark(current.x, current.y, Math.random() * Math.PI * 2);
+        const mark = addLeafMark(current.x, current.y, Math.random() * Math.PI * 2, randomLeafBrushSize());
         lastBrushPoint = current;
+        lastBrushSize = mark.size;
+        nextLeafBrushSize = randomLeafBrushSize();
         brushDistance = 0;
         return;
       }
@@ -845,29 +857,35 @@
       if (!distance) return;
 
       let travelled = 0;
-      let nextStep = leafBrushStep - brushDistance;
+      let nextStep = (lastBrushSize + nextLeafBrushSize) / 2 + leafBrushGap - brushDistance;
       while (distance - travelled >= nextStep) {
         travelled += nextStep;
         const progress = travelled / distance;
         const x = lastBrushPoint.x + deltaX * progress;
         const y = lastBrushPoint.y + deltaY * progress;
         const direction = Math.atan2(deltaY, deltaX) + (Math.random() - .5) * .34;
-        addLeafMark(x, y, direction);
-        nextStep = leafBrushStep;
+        const mark = addLeafMark(x, y, direction, nextLeafBrushSize);
+        lastBrushSize = mark.size;
+        nextLeafBrushSize = randomLeafBrushSize();
+        nextStep = (lastBrushSize + nextLeafBrushSize) / 2 + leafBrushGap;
       }
-      brushDistance = distance - travelled;
+      brushDistance = travelled ? distance - travelled : brushDistance + distance;
       lastBrushPoint = current;
     }
 
     garden.addEventListener("pointerenter", (event) => {
       lastBrushPoint = null;
       brushDistance = 0;
+      lastBrushSize = 0;
+      nextLeafBrushSize = null;
       paintLeafAtPointer(event);
     });
     garden.addEventListener("pointermove", paintLeafAtPointer);
     garden.addEventListener("pointerleave", () => {
       lastBrushPoint = null;
       brushDistance = 0;
+      lastBrushSize = 0;
+      nextLeafBrushSize = null;
     });
     function stopStamping(target) {
       if (target.stampFrame) {
@@ -911,7 +929,7 @@
       const stampImage = target.querySelector(".stamp-image");
       stampImage.src = selectedPattern.image;
       stampImage.alt = `${selectedPattern.name}圖樣`;
-      const printSize = stage.key === "bird" ? 1500 : stampIndex % 2 === 0 ? 300 : 600;
+      const printSize = stage.key === "bird" ? 600 : stampIndex % 2 === 0 ? 300 : 600;
       target.dataset.printSize = String(printSize);
       target.style.setProperty("--stamp-size", `${getDisplayStampSize(printSize)}px`);
       target.dataset.image = selectedPattern.image;
@@ -962,6 +980,8 @@
       patternLocked = false;
       lastBrushPoint = null;
       brushDistance = 0;
+      lastBrushSize = 0;
+      nextLeafBrushSize = null;
       updateStageView();
       gameStatus.textContent = `葉片完成，共畫了 ${leafMarks.length} 片；接著選一款花樣。`;
     });
@@ -1012,18 +1032,19 @@
       tileContext.fillRect(0, 0, tile.width, tile.height);
       tileContext.imageSmoothingEnabled = true;
       tileContext.imageSmoothingQuality = "high";
-      const layout = [
-        ["flower", null, "flower"],
-        ["flower", "bird", "flower"],
-        ["flower", null, "bird"]
-      ];
-      const cellSize = tile.width / 3;
+      const layoutSize = 6;
+      const layout = Array.from({ length: layoutSize }, (_, rowIndex) =>
+        Array.from({ length: layoutSize }, (_, columnIndex) =>
+          (rowIndex + columnIndex) % layoutSize === 0 ? "bird" : "flower"
+        )
+      );
+      const cellSize = tile.width / layoutSize;
 
       leafMarks.forEach((mark) => {
         const image = loadedImages.get(mark.image);
         const x = mark.x * tile.width;
         const y = mark.y * tile.height;
-        const halfSize = leafBrushSize / 2;
+        const halfSize = mark.size / 2;
         const xOffsets = [0];
         const yOffsets = [0];
         if (x < halfSize) xOffsets.push(tile.width);
@@ -1034,7 +1055,7 @@
           tileContext.save();
           tileContext.translate(x + offsetX, y + offsetY);
           tileContext.rotate(mark.angle);
-          tileContext.drawImage(image, -halfSize, -halfSize, leafBrushSize, leafBrushSize);
+          tileContext.drawImage(image, -halfSize, -halfSize, mark.size, mark.size);
           tileContext.restore();
         }));
       });
@@ -1043,7 +1064,7 @@
         row.forEach((kind, columnIndex) => {
           if (!kind) return;
           const choices = imagesByStage[kind];
-          const choice = choices[(rowIndex + columnIndex) % choices.length];
+          const choice = choices[(rowIndex * layoutSize + columnIndex) % choices.length];
           const image = loadedImages.get(choice.src);
           const centerX = columnIndex * cellSize + cellSize / 2;
           const centerY = rowIndex * cellSize + cellSize / 2;
@@ -1080,7 +1101,7 @@
         fabricPreview.src = fabricObjectUrl;
         fabricDownload.href = fabricObjectUrl;
         fabricDownload.hidden = false;
-        fabricStatus.textContent = "重複花布 JPG 已生成（4500 × 4500）；花為 300 或 600px、每隻鳥 1500px，葉片沿筆刷路徑排列，可下載保存。";
+        fabricStatus.textContent = "重複花布 JPG 已生成（4500 × 4500）；花為 300 或 600px、小鳥 600px，包含 30 朵花與 6 隻鳥，葉片大小隨機為 100–200px，可下載保存。";
       } catch (error) {
         if (generation === fabricGeneration) fabricStatus.textContent = `花布生成失敗：${error.message}`;
       } finally {
@@ -1119,6 +1140,8 @@
       leafMarks = [];
       lastBrushPoint = null;
       brushDistance = 0;
+      lastBrushSize = 0;
+      nextLeafBrushSize = null;
       resizeLeafCanvas();
       fabricStatus.textContent = "完成蓋印後，會在此生成花布 JPG。";
       gameStatus.textContent = "選好花樣就開始蓋印。";
